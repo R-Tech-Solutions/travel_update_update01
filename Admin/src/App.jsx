@@ -2,8 +2,8 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import AddPlace from "./pages/AddPlace";
-import Login from "./pages/Login";
-import Signup from "./pages/SighnUp"; // ✅ Corrected import
+// import Login from "./pages/Login";
+// import Signup from "./pages/SighnUp"; // ✅ Corrected import
 import { useState } from "react";
 
 function App() {
@@ -31,24 +31,24 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="/signup" element={<Signup />} /> {/* ✅ Signup Route */}
+        {/* <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/signup" element={<Signup />} /> ✅ Signup Route */}
 
         {/* Protected routes */}
         <Route
           path="/"
-          element={
-            <ProtectedRoute>
-              <Layout onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
+          // element={
+          //   <ProtectedRoute>
+          //     <Layout onLogout={handleLogout} />
+          //   </ProtectedRoute>
+          // }
         >
           <Route index element={<Home />} />
           <Route path="AddPlace" element={<AddPlace />} />
         </Route>
 
         {/* Catch-all route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
       </Routes>
     </BrowserRouter>
   );

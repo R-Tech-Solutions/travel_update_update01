@@ -12,7 +12,6 @@ def get_places(request):
     serialized_data = PlaceSerializer(Places, many=True).data
     return Response(serialized_data)
 
-
 @api_view(['POST'])
 def create_places(request):
     data = request.data
@@ -21,7 +20,6 @@ def create_places(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['DELETE'])
 def place_delete(request, pk):
