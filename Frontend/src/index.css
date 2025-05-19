@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .active {
+    @apply text-primary;
+  }
+}
+
+body{
+  background-color: black;
+  color: white;
+}
