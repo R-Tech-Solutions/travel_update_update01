@@ -2,8 +2,9 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Place
+from .models import Place, PlaceImage
 from .serializers import PlaceSerializer
+import os  # <-- Add this import at the top
 # Create your views here. 
 
 @api_view(['GET'])
@@ -14,11 +15,13 @@ def get_places(request):
 
 @api_view(['POST'])
 def create_places(request):
-    data = request.data
-    serializer = PlaceSerializer(data=data)
+    serializer = PlaceSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        place = serializer.save()
+        images = request.FILES.getlist('sub_images')
+        for img in images:
+            PlaceImage.objects.create(place=place, image=img)
+        return Response(PlaceSerializer(place).data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
@@ -40,11 +43,34 @@ def place_update(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
     
     data = request.data
-    serializer = PlaceSerializer(place, data=data)
+    serializer = PlaceSerializer(place, data=data, partial=True)
     if serializer.is_valid():
+        main_image = request.FILES.get('main_image')
+        if main_image:
+            # Delete old main image file
+            if place.main_image and place.main_image.path and os.path.isfile(place.main_image.path):
+                os.remove(place.main_image.path)
+            place.main_image = main_image
+        elif data.get('main_image_clear') == 'true':
+            # Remove main image if requested
+            if place.main_image and place.main_image.path and os.path.isfile(place.main_image.path):
+                os.remove(place.main_image.path)
+            place.main_image = None
+
+        sub_images = request.FILES.getlist('sub_images')
+        if sub_images:
+            # Delete old sub images and their files
+            for img in place.sub_images.all():
+                img.delete()
+            # Add new sub images
+            for img in sub_images:
+                PlaceImage.objects.create(place=place, image=img)
+        elif data.get('sub_images_clear') == 'true':
+            for img in place.sub_images.all():
+                img.delete()
+
         serializer.save()
-        return Response(serializer.data)
+        return Response(PlaceSerializer(place).data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
-    
-        
+
+

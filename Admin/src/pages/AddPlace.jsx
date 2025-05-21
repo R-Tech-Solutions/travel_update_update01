@@ -235,12 +235,373 @@ const PhotoUploader = ({
 );
 
 // Helper: get image URL for preview
-const getImageUrl = (file) =>
-  file
-    ? file instanceof File
-      ? URL.createObjectURL(file)
-      : file.url || "/placeholder.svg?height=200&width=300"
-    : "/placeholder.svg?height=200&width=300";
+const getImageUrl = (file) => {
+  if (!file) return "/placeholder.svg?height=200&width=300";
+  if (file instanceof File) return URL.createObjectURL(file);
+  if (file.url) {
+    // If url is already absolute, return as is
+    if (file.url.startsWith("http")) return file.url;
+    // If url is a media path, prepend backend URL
+    if (file.url.startsWith("/media/") || file.url.startsWith("media/")) {
+      return `http://127.0.0.1:8000${file.url.startsWith("/") ? "" : "/"}${
+        file.url
+      }`;
+    }
+    return file.url;
+  }
+  if (typeof file === "string") {
+    if (file.startsWith("http")) return file;
+    if (file.startsWith("/media/") || file.startsWith("media/")) {
+      return `http://127.0.0.1:8000${file.startsWith("/") ? "" : "/"}${file}`;
+    }
+    return file;
+  }
+  return "/placeholder.svg?height=200&width=300";
+};
+
+// Move this OUTSIDE of the AddPlace function, or at least define it as a stable component
+function AddModal({
+  show,
+  newPlace,
+  handleInputChange,
+  handleFileChange,
+  handleAddPhoto,
+  handleRemovePhoto,
+  handlePhotoChange,
+  handleAddArrayFieldItem,
+  handleRemoveArrayFieldItem,
+  handleArrayFieldChange,
+  setShowAdd,
+  handleAddPlace,
+  setNewPlace, // <-- add this prop
+}) {
+  if (!show) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+        <h2 className="text-xl font-bold mb-4">Add New Place</h2>
+        {/* Do NOT wrap the modal content in a <form> tag, just use divs */}
+        {/* ...existing code for Add form fields, use newPlace state and handlers... */}
+        <PlaceFormSection title="Basic Information">
+          {/* ...existing code... */}
+          <div>
+            <Label htmlFor="title">Place Name</Label>
+            <Input
+              id="title"
+              name="title"
+              value={newPlace.title}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <Label htmlFor="subtitle">City</Label>
+            <Input
+              id="subtitle"
+              name="subtitle"
+              value={newPlace.subtitle}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <Label htmlFor="place_type">Category</Label>
+            <Select
+              name="place_type"
+              value={newPlace.place_type}
+              onValueChange={(value) =>
+                setNewPlace((prev) => ({ ...prev, place_type: value }))
+              }
+            >
+              <SelectItem value="">Select Category</SelectItem>
+              <SelectItem value="trending">Trending Places</SelectItem>
+              <SelectItem value="adventure">Adventure Places</SelectItem>
+              <SelectItem value="honeymoon">Honeymoon Places</SelectItem>
+              <SelectItem value="beach">Beach Places</SelectItem>
+              <SelectItem value="historical">Historical Places</SelectItem>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="price">Price</Label>
+            <Input
+              id="price"
+              name="price"
+              value={newPlace.price}
+              onChange={handleInputChange}
+            />
+          </div>
+        </PlaceFormSection>
+        <PlaceFormSection title="Description">
+          <div>
+            <Label htmlFor="about_place">About Place</Label>
+            <Textarea
+              id="about_place"
+              name="about_place"
+              value={newPlace.about_place}
+              onChange={handleInputChange}
+              rows={3}
+            />
+          </div>
+        </PlaceFormSection>
+        <PlaceFormSection title="Media">
+          <div>
+            <Label htmlFor="main_image">Main Photo</Label>
+            <div className="flex items-center">
+              {newPlace.main_image && (
+                <div className="w-16 h-16 mr-2 border rounded overflow-hidden">
+                  <img
+                    src={getImageUrl(newPlace.main_image)}
+                    alt="Main"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <Input id="main_image" type="file" onChange={handleFileChange} />
+            </div>
+          </div>
+          <div>
+            <Label>Additional Photos</Label>
+            <PhotoUploader
+              photos={newPlace.sub_images}
+              onAddPhoto={handleAddPhoto}
+              onRemovePhoto={handleRemovePhoto}
+              onPhotoChange={handlePhotoChange}
+            />
+          </div>
+        </PlaceFormSection>
+        <PlaceFormSection title="Features">
+          <div>
+            <Label>Highlights</Label>
+            <ArrayInputManager
+              items={newPlace.highlights || []}
+              onAddItem={() => handleAddArrayFieldItem("highlights")}
+              onRemoveItem={(index) =>
+                handleRemoveArrayFieldItem("highlights", index)
+              }
+              onChangeItem={(index, value) =>
+                handleArrayFieldChange("highlights", index, value)
+              }
+              placeholderPrefix="Highlight"
+              addButtonText="Add Highlight"
+            />
+          </div>
+          <div>
+            <Label>Include</Label>
+            <ArrayInputManager
+              items={newPlace.includeText || []}
+              onAddItem={() => handleAddArrayFieldItem("includeText")}
+              onRemoveItem={(index) =>
+                handleRemoveArrayFieldItem("includeText", index)
+              }
+              onChangeItem={(index, value) =>
+                handleArrayFieldChange("includeText", index, value)
+              }
+              placeholderPrefix="Include item"
+              addButtonText="Add Include"
+            />
+          </div>
+          <div>
+            <Label>Exclude</Label>
+            <ArrayInputManager
+              items={newPlace.excludeText || []}
+              onAddItem={() => handleAddArrayFieldItem("excludeText")}
+              onRemoveItem={(index) =>
+                handleRemoveArrayFieldItem("excludeText", index)
+              }
+              onChangeItem={(index, value) =>
+                handleArrayFieldChange("excludeText", index, value)
+              }
+              placeholderPrefix="Exclude item"
+              addButtonText="Add Exclude"
+            />
+          </div>
+        </PlaceFormSection>
+        <div className="flex justify-end gap-2 mt-4">
+          <Button variant="outline" onClick={() => setShowAdd(false)}>
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            onClick={handleAddPlace}
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
+            Add Place
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Move EditModal OUTSIDE of AddPlace and make it a stable component
+function EditModal({
+  show,
+  selectedPlace,
+  handleEditInputChange,
+  handleEditFileChange,
+  handleEditAddPhoto,
+  handleEditRemovePhoto,
+  handleEditPhotoChange,
+  handleEditAddArrayFieldItem,
+  handleEditRemoveArrayFieldItem,
+  handleEditArrayFieldChange,
+  setShowEdit,
+  handleEditPlace,
+}) {
+  if (!show || !selectedPlace) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+        <h2 className="text-xl font-bold mb-4">Edit Place</h2>
+        <PlaceFormSection title="Basic Information">
+          {/* ...existing code for basic info... */}
+          <div>
+            <Label htmlFor="edit-title">Place Name</Label>
+            <Input
+              id="edit-title"
+              name="title"
+              value={selectedPlace.title}
+              onChange={handleEditInputChange}
+            />
+          </div>
+          <div>
+            <Label htmlFor="edit-subtitle">City</Label>
+            <Input
+              id="edit-subtitle"
+              name="subtitle"
+              value={selectedPlace.subtitle}
+              onChange={handleEditInputChange}
+            />
+          </div>
+          <div>
+            <Label htmlFor="edit-place_type">Category</Label>
+            <Select
+              name="place_type"
+              value={selectedPlace.place_type}
+              onValueChange={(value) =>
+                handleEditInputChange({ target: { name: "place_type", value } })
+              }
+            >
+              <SelectItem value="">Select Category</SelectItem>
+              <SelectItem value="trending">Trending Places</SelectItem>
+              <SelectItem value="adventure">Adventure Places</SelectItem>
+              <SelectItem value="honeymoon">Honeymoon Places</SelectItem>
+              <SelectItem value="beach">Beach Places</SelectItem>
+              <SelectItem value="historical">Historical Places</SelectItem>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="edit-price">Price</Label>
+            <Input
+              id="edit-price"
+              name="price"
+              value={selectedPlace.price}
+              onChange={handleEditInputChange}
+            />
+          </div>
+        </PlaceFormSection>
+        <PlaceFormSection title="Description">
+          <div>
+            <Label htmlFor="edit-about_place">About Place</Label>
+            <Textarea
+              id="edit-about_place"
+              name="about_place"
+              value={selectedPlace.about_place}
+              onChange={handleEditInputChange}
+              rows={3}
+            />
+          </div>
+        </PlaceFormSection>
+        <PlaceFormSection title="Media">
+          <div>
+            <Label htmlFor="edit-main_image">Main Photo</Label>
+            <div className="flex items-center">
+              {selectedPlace.main_image && (
+                <div className="w-16 h-16 mr-2 border rounded overflow-hidden">
+                  <img
+                    src={getImageUrl(selectedPlace.main_image)}
+                    alt="Main"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <Input
+                id="edit-main_image"
+                type="file"
+                onChange={handleEditFileChange}
+              />
+            </div>
+          </div>
+          <div>
+            <Label>Additional Photos</Label>
+            <PhotoUploader
+              photos={selectedPlace.sub_images}
+              onAddPhoto={handleEditAddPhoto}
+              onRemovePhoto={handleEditRemovePhoto}
+              onPhotoChange={handleEditPhotoChange}
+            />
+          </div>
+        </PlaceFormSection>
+        <PlaceFormSection title="Features">
+          <div>
+            <Label>Highlights</Label>
+            <ArrayInputManager
+              items={selectedPlace.highlights || []}
+              onAddItem={() => handleEditAddArrayFieldItem("highlights")}
+              onRemoveItem={(index) =>
+                handleEditRemoveArrayFieldItem("highlights", index)
+              }
+              onChangeItem={(index, value) =>
+                handleEditArrayFieldChange("highlights", index, value)
+              }
+              placeholderPrefix="Highlight"
+              addButtonText="Add Highlight"
+            />
+          </div>
+          <div>
+            <Label>Include</Label>
+            <ArrayInputManager
+              items={selectedPlace.includeText || []}
+              onAddItem={() => handleEditAddArrayFieldItem("includeText")}
+              onRemoveItem={(index) =>
+                handleEditRemoveArrayFieldItem("includeText", index)
+              }
+              onChangeItem={(index, value) =>
+                handleEditArrayFieldChange("includeText", index, value)
+              }
+              placeholderPrefix="Include item"
+              addButtonText="Add Include"
+            />
+          </div>
+          <div>
+            <Label>Exclude</Label>
+            <ArrayInputManager
+              items={selectedPlace.excludeText || []}
+              onAddItem={() => handleEditAddArrayFieldItem("excludeText")}
+              onRemoveItem={(index) =>
+                handleEditRemoveArrayFieldItem("excludeText", index)
+              }
+              onChangeItem={(index, value) =>
+                handleEditArrayFieldChange("excludeText", index, value)
+              }
+              placeholderPrefix="Exclude item"
+              addButtonText="Add Exclude"
+            />
+          </div>
+        </PlaceFormSection>
+        <div className="flex justify-end gap-2 mt-4">
+          <Button variant="outline" onClick={() => setShowEdit(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleEditPlace}
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
+            Save Changes
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Main Component
 function AddPlace() {
@@ -293,13 +654,16 @@ function AddPlace() {
 
   // Add new place
   const handleAddPlace = async () => {
+    // Remove this block or add a user message if validation fails
     if (
       !newPlace.title ||
       !newPlace.subtitle ||
       !newPlace.place_type ||
       !newPlace.price
-    )
+    ) {
+      alert("Please fill all required fields.");
       return;
+    }
 
     try {
       setLoading(true);
@@ -308,29 +672,27 @@ function AddPlace() {
       // Append text fields
       formData.append("title", newPlace.title);
       formData.append("subtitle", newPlace.subtitle);
-      // Ensure price is sent as a number if not empty
-      formData.append("price", newPlace.price === '' ? '' : Number(newPlace.price));
+      formData.append(
+        "price",
+        newPlace.price === "" ? "" : Number(newPlace.price)
+      );
       formData.append("about_place", newPlace.about_place);
       formData.append("place_type", newPlace.place_type);
       formData.append("tour_highlights", JSON.stringify(newPlace.highlights));
       formData.append("include", JSON.stringify(newPlace.includeText));
       formData.append("exclude", JSON.stringify(newPlace.excludeText));
 
-      // Send main_image as JSON with base64 url
-      formData.append(
-        "main_image",
-        JSON.stringify(newPlace.main_image ? newPlace.main_image : {})
-      );
+      // Main image: send as file if available
+      if (newPlace.main_image && newPlace.main_image.file) {
+        formData.append("main_image", newPlace.main_image.file);
+      }
 
-      // Send sub_images as array of base64 objects
-      formData.append(
-        "sub_images",
-        JSON.stringify(
-          newPlace.sub_images.filter(Boolean).map((img) =>
-            img && img.url ? img : { url: "" }
-          )
-        )
-      );
+      // Additional photos: send each as a file (skip nulls)
+      newPlace.sub_images
+        .filter((imgObj) => imgObj && imgObj.file)
+        .forEach((imgObj) => {
+          formData.append("sub_images", imgObj.file);
+        });
 
       await axios.post("http://127.0.0.1:8000/api/places/create/", formData, {
         headers: {
@@ -354,13 +716,36 @@ function AddPlace() {
       });
     } catch (err) {
       setError(err.message);
+      alert(
+        "Failed to add place: " + (err.response?.data?.detail || err.message)
+      );
       console.error("Error details:", err.response?.data); // Log detailed error
     } finally {
       setLoading(false);
     }
   };
 
-  // Edit place
+  // Edit main image handler: store as { file, url }
+  const handleEditFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setSelectedPlace((prev) => ({
+      ...prev,
+      main_image: { file, url: URL.createObjectURL(file) },
+    }));
+  };
+
+  // Edit additional photo handler: store as { file, url }
+  const handleEditPhotoChange = (index, file) => {
+    if (!file) return;
+    setSelectedPlace((prev) => {
+      const updated = [...prev.sub_images];
+      updated[index] = { file, url: URL.createObjectURL(file) };
+      return { ...prev, sub_images: updated };
+    });
+  };
+
+  // Edit place: only send files for images that have .file
   const handleEditPlace = async () => {
     if (!selectedPlace) return;
     try {
@@ -371,14 +756,34 @@ function AddPlace() {
       formData.append("price", selectedPlace.price);
       formData.append("about_place", selectedPlace.about_place);
       formData.append("place_type", selectedPlace.place_type);
-      if (selectedPlace.main_image)
-        formData.append("main_image", selectedPlace.main_image);
-      selectedPlace.sub_images.forEach(
-        (img) => img && formData.append("sub_images", img)
+
+      // Only send main_image if it's a new file
+      if (selectedPlace.main_image && selectedPlace.main_image.file) {
+        formData.append("main_image", selectedPlace.main_image.file);
+      }
+
+      formData.append(
+        "tour_highlights",
+        JSON.stringify(selectedPlace.highlights || [])
       );
-      formData.append("highlights", JSON.stringify(selectedPlace.highlights));
-      formData.append("includeText", JSON.stringify(selectedPlace.includeText));
-      formData.append("excludeText", JSON.stringify(selectedPlace.excludeText));
+      formData.append(
+        "include",
+        JSON.stringify(selectedPlace.includeText || [])
+      );
+      formData.append(
+        "exclude",
+        JSON.stringify(selectedPlace.excludeText || [])
+      );
+
+      // Only send new sub_images as files
+      if (selectedPlace.sub_images && selectedPlace.sub_images.length > 0) {
+        selectedPlace.sub_images
+          .filter((imgObj) => imgObj && imgObj.file)
+          .forEach((imgObj) => {
+            formData.append("sub_images", imgObj.file);
+          });
+      }
+
       await axios.put(
         `http://127.0.0.1:8000/api/places/${selectedPlace.id}/update/`,
         formData,
@@ -389,6 +794,7 @@ function AddPlace() {
       setSelectedPlace(null);
     } catch (err) {
       setError(err.message);
+      console.error("Error details:", err.response?.data);
     } finally {
       setLoading(false);
     }
@@ -418,23 +824,15 @@ function AddPlace() {
   const handleFileChange = (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setNewPlace((prev) => ({
-        ...prev,
-        main_image: { url: reader.result },
-      }));
-    };
-    reader.readAsDataURL(file);
+    setNewPlace((prev) => ({
+      ...prev,
+      main_image: { file, url: URL.createObjectURL(file) },
+    }));
   };
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setSelectedPlace((prev) => ({ ...prev, [name]: value }));
-  };
-  const handleEditFileChange = (e) => {
-    if (e.target.files?.[0])
-      setSelectedPlace((prev) => ({ ...prev, main_image: e.target.files[0] }));
   };
 
   // Array fields for add
@@ -490,15 +888,11 @@ function AddPlace() {
     }));
   const handlePhotoChange = (index, file) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setNewPlace((prev) => {
-        const updated = [...prev.sub_images];
-        updated[index] = { url: reader.result };
-        return { ...prev, sub_images: updated };
-      });
-    };
-    reader.readAsDataURL(file);
+    setNewPlace((prev) => {
+      const updated = [...prev.sub_images];
+      updated[index] = { file, url: URL.createObjectURL(file) };
+      return { ...prev, sub_images: updated };
+    });
   };
 
   // Photo handlers for edit
@@ -512,329 +906,9 @@ function AddPlace() {
       ...prev,
       sub_images: prev.sub_images.filter((_, i) => i !== index),
     }));
-  const handleEditPhotoChange = (index, file) =>
-    setSelectedPlace((prev) => {
-      const updated = [...prev.sub_images];
-      updated[index] = file;
-      return { ...prev, sub_images: updated };
-    });
-  const AddModal = () =>
-    showAdd && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
-          <h2 className="text-xl font-bold mb-4">Add New Place</h2>
-          {/* ...existing code for Add form fields, use newPlace state and handlers... */}
-          <PlaceFormSection title="Basic Information">
-            {/* ...existing code... */}
-            <div>
-              <Label htmlFor="title">Place Name</Label>
-              <Input
-                id="title"
-                name="title"
-                value={newPlace.title}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="subtitle">City</Label>
-              <Input
-                id="subtitle"
-                name="subtitle"
-                value={newPlace.subtitle}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="place_type">Category</Label>
-              <Select
-                name="place_type"
-                value={newPlace.place_type}
-                onValueChange={(value) =>
-                  setNewPlace((prev) => ({ ...prev, place_type: value }))
-                }
-              >
-                <SelectItem value="">Select Category</SelectItem>
-                <SelectItem value="trending">Trending Places</SelectItem>
-                <SelectItem value="adventure">Adventure Places</SelectItem>
-                <SelectItem value="honeymoon">Honeymoon Places</SelectItem>
-                <SelectItem value="beach">Beach Places</SelectItem>
-                <SelectItem value="historical">Historical Places</SelectItem>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="price">Price</Label>
-              <Input
-                id="price"
-                name="price"
-                value={newPlace.price}
-                onChange={handleInputChange}
-              />
-            </div>
-          </PlaceFormSection>
-          <PlaceFormSection title="Description">
-            <div>
-              <Label htmlFor="about_place">About Place</Label>
-              <Textarea
-                id="about_place"
-                name="about_place"
-                value={newPlace.about_place}
-                onChange={handleInputChange}
-                rows={3}
-              />
-            </div>
-          </PlaceFormSection>
-          <PlaceFormSection title="Media">
-            <div>
-              <Label htmlFor="main_image">Main Photo</Label>
-              <div className="flex items-center">
-                {newPlace.main_image && (
-                  <div className="w-16 h-16 mr-2 border rounded overflow-hidden">
-                    <img
-                      src={getImageUrl(newPlace.main_image)}
-                      alt="Main"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <Input
-                  id="main_image"
-                  type="file"
-                  onChange={handleFileChange}
-                />
-               
-              </div>
-            </div>
-            <div>
-              <Label>Additional Photos</Label>
-              <PhotoUploader
-                photos={newPlace.sub_images}
-                onAddPhoto={handleAddPhoto}
-                onRemovePhoto={handleRemovePhoto}
-                onPhotoChange={handlePhotoChange}
-              />
-            </div>
-          </PlaceFormSection>
-          <PlaceFormSection title="Features">
-            <div>
-              <Label>Highlights</Label>
-              <ArrayInputManager
-                items={newPlace.highlights}
-                onAddItem={() => handleAddArrayFieldItem("highlights")}
-                onRemoveItem={(index) =>
-                  handleRemoveArrayFieldItem("highlights", index)
-                }
-                onChangeItem={(index, value) =>
-                  handleArrayFieldChange("highlights", index, value)
-                }
-                placeholderPrefix="Highlight"
-                addButtonText="Add Highlight"
-              />
-            </div>
-            <div>
-              <Label>Include</Label>
-              <ArrayInputManager
-                items={newPlace.includeText}
-                onAddItem={() => handleAddArrayFieldItem("includeText")}
-                onRemoveItem={(index) =>
-                  handleRemoveArrayFieldItem("includeText", index)
-                }
-                onChangeItem={(index, value) =>
-                  handleArrayFieldChange("includeText", index, value)
-                }
-                placeholderPrefix="Include item"
-                addButtonText="Add Include"
-              />
-            </div>
-            <div>
-              <Label>Exclude</Label>
-              <ArrayInputManager
-                items={newPlace.excludeText}
-                onAddItem={() => handleAddArrayFieldItem("excludeText")}
-                onRemoveItem={(index) =>
-                  handleRemoveArrayFieldItem("excludeText", index)
-                }
-                onChangeItem={(index, value) =>
-                  handleArrayFieldChange("excludeText", index, value)
-                }
-                placeholderPrefix="Exclude item"
-                addButtonText="Add Exclude"
-              />
-            </div>
-          </PlaceFormSection>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setShowAdd(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleAddPlace}
-              className="bg-indigo-600 hover:bg-indigo-700"
-            >
-              Add Place
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+  // Use the renamed function for photo change
+  const handleEditPhotoChangeSingle = handleEditPhotoChange;
 
-  // Edit Modal
-  const EditModal = () =>
-    showEdit &&
-    selectedPlace && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
-          <h2 className="text-xl font-bold mb-4">Edit Place</h2>
-          {/* ...existing code for Edit form fields, use selectedPlace state and handlers... */}
-          <PlaceFormSection title="Basic Information">
-            <div>
-              <Label htmlFor="edit-title">Place Name</Label>
-              <Input
-                id="edit-title"
-                name="title"
-                value={selectedPlace.title}
-                onChange={handleEditInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-subtitle">City</Label>
-              <Input
-                id="edit-subtitle"
-                name="subtitle"
-                value={selectedPlace.subtitle}
-                onChange={handleEditInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-place_type">Category</Label>
-              <Select
-                name="place_type"
-                value={selectedPlace.place_type}
-                onValueChange={(value) =>
-                  setSelectedPlace((prev) => ({ ...prev, place_type: value }))
-                }
-              >
-                <SelectItem value="">Select Category</SelectItem>
-                <SelectItem value="trending">Trending Places</SelectItem>
-                <SelectItem value="adventure">Adventure Places</SelectItem>
-                <SelectItem value="honeymoon">Honeymoon Places</SelectItem>
-                <SelectItem value="beach">Beach Places</SelectItem>
-                <SelectItem value="historical">Historical Places</SelectItem>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="edit-price">Price</Label>
-              <Input
-                id="edit-price"
-                name="price"
-                value={selectedPlace.price}
-                onChange={handleEditInputChange}
-              />
-            </div>
-          </PlaceFormSection>
-          <PlaceFormSection title="Description">
-            <div>
-              <Label htmlFor="edit-about_place">About Place</Label>
-              <Textarea
-                id="edit-about_place"
-                name="about_place"
-                value={selectedPlace.about_place}
-                onChange={handleEditInputChange}
-                rows={3}
-              />
-            </div>
-          </PlaceFormSection>
-          <PlaceFormSection title="Media">
-            <div>
-              <Label htmlFor="edit-main_image">Main Photo</Label>
-              <div className="flex items-center">
-                {selectedPlace.main_image && (
-                  <div className="w-16 h-16 mr-2 border rounded overflow-hidden">
-                    <img
-                      src={getImageUrl(selectedPlace.main_image)}
-                      alt="Main"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <Input
-                  id="edit-main_image"
-                  type="file"
-                  onChange={handleEditFileChange}
-                />
-              </div>
-            </div>
-            <div>
-              <Label>Additional Photos</Label>
-              <PhotoUploader
-                photos={selectedPlace.sub_images}
-                onAddPhoto={handleEditAddPhoto}
-                onRemovePhoto={handleEditRemovePhoto}
-                onPhotoChange={handleEditPhotoChange}
-              />
-            </div>
-          </PlaceFormSection>
-          <PlaceFormSection title="Features">
-            <div>
-              <Label>Highlights</Label>
-              <ArrayInputManager
-                items={selectedPlace.highlights}
-                onAddItem={() => handleEditAddArrayFieldItem("highlights")}
-                onRemoveItem={(index) =>
-                  handleEditRemoveArrayFieldItem("highlights", index)
-                }
-                onChangeItem={(index, value) =>
-                  handleEditArrayFieldChange("highlights", index, value)
-                }
-                placeholderPrefix="Highlight"
-                addButtonText="Add Highlight"
-              />
-            </div>
-            <div>
-              <Label>Include</Label>
-              <ArrayInputManager
-                items={selectedPlace.includeText}
-                onAddItem={() => handleEditAddArrayFieldItem("includeText")}
-                onRemoveItem={(index) =>
-                  handleEditRemoveArrayFieldItem("includeText", index)
-                }
-                onChangeItem={(index, value) =>
-                  handleEditArrayFieldChange("includeText", index, value)
-                }
-                placeholderPrefix="Include item"
-                addButtonText="Add Include"
-              />
-            </div>
-            <div>
-              <Label>Exclude</Label>
-              <ArrayInputManager
-                items={selectedPlace.excludeText}
-                onAddItem={() => handleEditAddArrayFieldItem("excludeText")}
-                onRemoveItem={(index) =>
-                  handleEditRemoveArrayFieldItem("excludeText", index)
-                }
-                onChangeItem={(index, value) =>
-                  handleEditArrayFieldChange("excludeText", index, value)
-                }
-                placeholderPrefix="Exclude item"
-                addButtonText="Add Exclude"
-              />
-            </div>
-          </PlaceFormSection>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setShowEdit(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleEditPlace}
-              className="bg-indigo-600 hover:bg-indigo-700"
-            >
-              Save Changes
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-
-  // View Modal
   const ViewModal = () =>
     showView &&
     selectedPlace && (
@@ -847,11 +921,22 @@ function AddPlace() {
               size="sm"
               onClick={() => {
                 setShowView(false);
+                setSelectedPlace((prev) => ({
+                  ...prev,
+                  sub_images: Array.isArray(prev.sub_images)
+                    ? prev.sub_images.map((imgObj) =>
+                        imgObj && imgObj.url
+                          ? imgObj
+                          : imgObj && imgObj.image
+                          ? { url: imgObj.image }
+                          : null
+                      )
+                    : [],
+                }));
                 setShowEdit(true);
               }}
             >
-              {" "}
-              <Edit className="w-4 h-4 mr-2" /> Edit{" "}
+              <Edit className="w-4 h-4 mr-2" /> Edit
             </Button>
             <Button
               variant="outline"
@@ -859,8 +944,7 @@ function AddPlace() {
               onClick={() => handleDeletePlace(selectedPlace.id)}
               className="text-red-600"
             >
-              {" "}
-              <Trash2 className="w-4 h-4 mr-2" /> Delete{" "}
+              <Trash2 className="w-4 h-4 mr-2" /> Delete
             </Button>
           </div>
           <PlaceFormSection title="Basic Information">
@@ -966,13 +1050,26 @@ function AddPlace() {
           <PlaceFormSection title="Features">
             <div>
               <Label>Highlights</Label>
-              {selectedPlace.highlights?.length > 0 ? (
+              {/* Show highlights as a comma-separated string if all are empty */}
+              {Array.isArray(selectedPlace.highlights) &&
+              selectedPlace.highlights.length > 0 &&
+              selectedPlace.highlights.some((h) => h && h.trim()) ? (
                 <div className="space-y-2 mt-1">
-                  {selectedPlace.highlights.map((highlight, index) => (
-                    <div key={index} className="border rounded-md p-2">
-                      <span>{highlight}</span>
-                    </div>
-                  ))}
+                  {selectedPlace.highlights.map((highlight, index) =>
+                    highlight && highlight.trim() ? (
+                      <div key={index} className="border rounded-md p-2">
+                        <span>{highlight}</span>
+                      </div>
+                    ) : null
+                  )}
+                </div>
+              ) : // Show the raw value if it's a string (backend bug fallback)
+              typeof selectedPlace.highlights === "string" &&
+                selectedPlace.highlights.trim() !== "" ? (
+                <div className="space-y-2 mt-1">
+                  <div className="border rounded-md p-2">
+                    <span>{selectedPlace.highlights}</span>
+                  </div>
                 </div>
               ) : (
                 <div className="text-gray-500 text-sm mt-1">No highlights</div>
@@ -980,16 +1077,27 @@ function AddPlace() {
             </div>
             <div>
               <Label>Include</Label>
-              {selectedPlace.includeText?.length > 0 ? (
+              {Array.isArray(selectedPlace.includeText) &&
+              selectedPlace.includeText.length > 0 &&
+              selectedPlace.includeText.some((i) => i && i.trim()) ? (
                 <div className="space-y-2 mt-1">
-                  {selectedPlace.includeText.map((text, index) => (
-                    <div key={index} className="border rounded-md p-2">
-                      <div className="flex items-center">
-                        <div className="mr-2 text-green-500">✓</div>
-                        <span>{text}</span>
+                  {selectedPlace.includeText.map((text, index) =>
+                    text && text.trim() ? (
+                      <div key={index} className="border rounded-md p-2">
+                        <div className="flex items-center">
+                          <div className="mr-2 text-green-500">✓</div>
+                          <span>{text}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ) : null
+                  )}
+                </div>
+              ) : typeof selectedPlace.includeText === "string" &&
+                selectedPlace.includeText.trim() !== "" ? (
+                <div className="space-y-2 mt-1">
+                  <div className="border rounded-md p-2">
+                    <span>{selectedPlace.includeText}</span>
+                  </div>
                 </div>
               ) : (
                 <div className="text-gray-500 text-sm mt-1">
@@ -999,16 +1107,27 @@ function AddPlace() {
             </div>
             <div>
               <Label>Exclude</Label>
-              {selectedPlace.excludeText?.length > 0 ? (
+              {Array.isArray(selectedPlace.excludeText) &&
+              selectedPlace.excludeText.length > 0 &&
+              selectedPlace.excludeText.some((i) => i && i.trim()) ? (
                 <div className="space-y-2 mt-1">
-                  {selectedPlace.excludeText.map((text, index) => (
-                    <div key={index} className="border rounded-md p-2">
-                      <div className="flex items-center">
-                        <div className="mr-2 text-red-500">✕</div>
-                        <span>{text}</span>
+                  {selectedPlace.excludeText.map((text, index) =>
+                    text && text.trim() ? (
+                      <div key={index} className="border rounded-md p-2">
+                        <div className="flex items-center">
+                          <div className="mr-2 text-red-500">✕</div>
+                          <span>{text}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ) : null
+                  )}
+                </div>
+              ) : typeof selectedPlace.excludeText === "string" &&
+                selectedPlace.excludeText.trim() !== "" ? (
+                <div className="space-y-2 mt-1">
+                  <div className="border rounded-md p-2">
+                    <span>{selectedPlace.excludeText}</span>
+                  </div>
                 </div>
               ) : (
                 <div className="text-gray-500 text-sm mt-1">
@@ -1096,7 +1215,35 @@ function AddPlace() {
                     variant="ghost"
                     size="icon"
                     onClick={() => {
-                      setSelectedPlace({ ...place });
+                      setSelectedPlace({
+                        ...place,
+                        main_image: place.main_image
+                          ? { url: place.main_image }
+                          : null,
+                        sub_images: Array.isArray(place.sub_images)
+                          ? place.sub_images.map((imgObj) =>
+                              imgObj && imgObj.image
+                                ? { url: imgObj.image }
+                                : null
+                            )
+                          : [],
+                        // Parse the JSON strings if they exist
+                        highlights: place.tour_highlights
+                          ? typeof place.tour_highlights === "string"
+                            ? JSON.parse(place.tour_highlights)
+                            : place.tour_highlights
+                          : [],
+                        includeText: place.include
+                          ? typeof place.include === "string"
+                            ? JSON.parse(place.include)
+                            : place.include
+                          : [],
+                        excludeText: place.exclude
+                          ? typeof place.exclude === "string"
+                            ? JSON.parse(place.exclude)
+                            : place.exclude
+                          : [],
+                      });
                       setShowView(true);
                     }}
                     className="text-gray-600 hover:text-gray-800"
@@ -1110,11 +1257,60 @@ function AddPlace() {
         </table>
       </div>
       {/* Modals as Divs */}
-      <AddModal />
-      <EditModal />
+      <AddModal
+        show={showAdd}
+        newPlace={newPlace}
+        handleInputChange={handleInputChange}
+        handleFileChange={handleFileChange}
+        handleAddPhoto={handleAddPhoto}
+        handleRemovePhoto={handleRemovePhoto}
+        handlePhotoChange={handlePhotoChange}
+        handleAddArrayFieldItem={handleAddArrayFieldItem}
+        handleRemoveArrayFieldItem={handleRemoveArrayFieldItem}
+        handleArrayFieldChange={handleArrayFieldChange}
+        setShowAdd={setShowAdd}
+        handleAddPlace={handleAddPlace}
+        setNewPlace={setNewPlace} // <-- pass setNewPlace as a prop
+      />
+      <EditModal
+        show={showEdit}
+        selectedPlace={selectedPlace}
+        handleEditInputChange={handleEditInputChange}
+        handleEditFileChange={handleEditFileChange}
+        handleEditAddPhoto={handleEditAddPhoto}
+        handleEditRemovePhoto={handleEditRemovePhoto}
+        handleEditPhotoChange={handleEditPhotoChange}
+        handleEditAddArrayFieldItem={handleEditAddArrayFieldItem}
+        handleEditRemoveArrayFieldItem={handleEditRemoveArrayFieldItem}
+        handleEditArrayFieldChange={handleEditArrayFieldChange}
+        setShowEdit={setShowEdit}
+        handleEditPlace={handleEditPlace}
+      />
       <ViewModal />
     </div>
   );
 }
 
 export default AddPlace;
+
+// This error is from your Django backend, not your React code:
+// SuspiciousFileOperation: Storage can not find an available filename for ".../sub_images\DALLE_...webp". Please make sure that the corresponding file field allows sufficient "max_length".
+
+// **How to fix:**
+// 1. In your Django model for the Place or sub_images, the file/image field has a max_length (default is 100).
+// 2. The filename you are uploading is too long for this field.
+// 3. Solution: In your Django model, set max_length=255 (or higher) for the ImageField/FileField for sub_images and main_image.
+
+// Example Django model fix:
+//
+// class Place(models.Model):
+//     # ...existing fields...
+//     main_image = models.ImageField(upload_to='places/main_images/', max_length=255, blank=True, null=True)
+//     sub_images = models.ImageField(upload_to='places/sub_images/', max_length=255, blank=True, null=True)
+//     # or if using a related model for sub_images, set max_length=255 there too.
+//
+// After changing the model, run:
+//   python manage.py makemigrations
+//   python manage.py migrate
+
+// This will resolve the 400/500 error when uploading images with long filenames.

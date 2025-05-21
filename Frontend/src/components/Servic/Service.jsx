@@ -7,7 +7,6 @@ import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { getPlaces } from "../../ServiceApi/api"; // Import the API function
 
 // Image imports
 import BeachImg from "../../assets/nature.jpg";
