@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import AddPlace from "./pages/AddPlace";
 import Login from "./pages/Login";
 import Signup from "./pages/SighnUp"; // ✅ Corrected import
+import Orders  from "./pages/Orders";
 import { useState } from "react";
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
         >
           <Route index element={<Home />} />
           <Route path="AddPlace" element={<AddPlace />} />
+          <Route path="Orders" element={<Orders />} />
         </Route>
 
         {/* Catch-all route */}

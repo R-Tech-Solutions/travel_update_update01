@@ -6,11 +6,14 @@ class Place(models.Model):
     place_type = [
         ('trending', 'Trending Places'),
         ('adventure', 'Adventure Places'),
-        ('honeymoon', 'Honeymoon Places'),
-        ('beach', 'Beach Places'),
-        ('historical', 'Historical Places'),
-
+        ('Hiking', 'Hiking & Trekking Places' ),
+        ('Leisure', 'Leisure Travel Places'),
+        # ('honeymoon', 'Honeymoon Places'),
+        # ('beach', 'Beach Places'),
+        # ('historical', 'Historical Places'),
+        # ('place', 'place') 
     ]
+    
     title = models.CharField(max_length=50)
     subtitle = models.CharField(max_length=200)
     price = models.DecimalField (max_digits=10, decimal_places=2)
@@ -19,6 +22,7 @@ class Place(models.Model):
     # tour_itinerary = models.CharField(max_length=200)
     include = models.CharField(max_length=200)
     exclude = models.CharField(max_length=200)
+    price_title = models.CharField(max_length=100, null=False, blank=True, default="")
     main_image = models.ImageField(upload_to='places/main_images/', null=True, blank=True, max_length=255)  # Example: {"url": "images/sigiriya.jpg"}
     # Remove sub_images JSONField if present
     place_type = models.CharField(max_length=50, choices=place_type, default= 'trending')
@@ -44,3 +48,4 @@ class PlaceImage(models.Model):
         if self.image and self.image.path and os.path.isfile(self.image.path):
             os.remove(self.image.path)
         super().delete(*args, **kwargs)
+

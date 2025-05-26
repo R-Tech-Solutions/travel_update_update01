@@ -13,6 +13,15 @@ def get_places(request):
     serialized_data = PlaceSerializer(Places, many=True).data
     return Response(serialized_data)
 
+@api_view(['GET'])
+def place_detail(request, pk):
+    try:
+        place = Place.objects.get(pk=pk)
+    except Place.DoesNotExist:
+        return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+    serializer = PlaceSerializer(place)
+    return Response(serializer.data)
+
 @api_view(['POST'])
 def create_places(request):
     serializer = PlaceSerializer(data=request.data)

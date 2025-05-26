@@ -316,7 +316,8 @@ function AddModal({
               <SelectItem value="adventure">Adventure Places</SelectItem>
               <SelectItem value="honeymoon">Honeymoon Places</SelectItem>
               <SelectItem value="beach">Beach Places</SelectItem>
-              <SelectItem value="historical">Historical Places</SelectItem>
+              <SelectItem value="Hiking">Hiking & Trekking Places</SelectItem>
+              <SelectItem value="Leisure">Leisure Travel Places</SelectItem>
             </Select>
           </div>
           <div>
@@ -338,6 +339,16 @@ function AddModal({
               value={newPlace.about_place}
               onChange={handleInputChange}
               rows={3}
+            />
+          </div>
+          <div>
+            <Label htmlFor="price_title">Price Title</Label>
+            <Input
+              id="price_title"
+              name="price_title"
+              value={newPlace.price_title}
+              onChange={handleInputChange}
+              placeholder="Enter price title (e.g. Per Person, Per Night, etc.)"
             />
           </div>
         </PlaceFormSection>
@@ -486,6 +497,8 @@ function EditModal({
               <SelectItem value="honeymoon">Honeymoon Places</SelectItem>
               <SelectItem value="beach">Beach Places</SelectItem>
               <SelectItem value="historical">Historical Places</SelectItem>
+              <SelectItem value="Hiking">Hiking & Trekking Places</SelectItem>
+              <SelectItem value="Leisure">Leisure Travel Places</SelectItem>
             </Select>
           </div>
           <div>
@@ -626,6 +639,7 @@ function AddPlace() {
     price: "",
     about_place: "",
     place_type: "",
+    price_title: "",
     main_image: null,
     sub_images: [],
     highlights: [],
@@ -681,6 +695,7 @@ function AddPlace() {
       formData.append("tour_highlights", JSON.stringify(newPlace.highlights));
       formData.append("include", JSON.stringify(newPlace.includeText));
       formData.append("exclude", JSON.stringify(newPlace.excludeText));
+      formData.append("price_title", newPlace.price_title);
 
       // Main image: send as file if available
       if (newPlace.main_image && newPlace.main_image.file) {
@@ -709,6 +724,7 @@ function AddPlace() {
         about_place: "",
         place_type: "",
         main_image: null,
+        price_title: "",
         sub_images: [],
         highlights: [],
         includeText: [],
@@ -756,6 +772,7 @@ function AddPlace() {
       formData.append("price", selectedPlace.price);
       formData.append("about_place", selectedPlace.about_place);
       formData.append("place_type", selectedPlace.place_type);
+      formData.append("price_title", selectedPlace.price_title);
 
       // Only send main_image if it's a new file
       if (selectedPlace.main_image && selectedPlace.main_image.file) {
@@ -989,6 +1006,15 @@ function AddPlace() {
                 readOnly
                 className="bg-gray-50"
                 rows={3}
+              />
+            </div>
+
+            <div>
+              <Label>Price</Label>
+              <Input
+                value={selectedPlace.price_title}
+                readOnly
+                className="bg-gray-50"
               />
             </div>
           </PlaceFormSection>

@@ -1,206 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import PropTypes from "prop-types";
-import Product1 from "../../assets/plc/img1.jpg";
-import Product2 from "../../assets/plc/img2.jpg";
-import Product3 from "../../assets/plc/img3.jpg";
-import Product4 from "../../assets/plc/img4.jpg";
-import thumbnail1 from "../../assets/plc/img5.jpg";
-import thumbnail2 from "../../assets/plc/img6.jpg";
-import thumbnail3 from "../../assets/plc/img7.jpg";
-import thumbnail4 from "../../assets/plc/img8.jpg";
 import ScrollToTop from "react-scroll-to-top";
 
-const ImageSelector = ({ lightbox }) => {
-  const [currentSlide, setCurrentSlide] = useState(Product1);
-  const navigate = useNavigate();
+// Helper: get image URL for preview (like AddPlace)
+const getImageUrl = (img) => {
+  if (!img) return "/placeholder.svg";
+  if (
+    typeof img === "string" &&
+    (img.startsWith("http://") || img.startsWith("https://"))
+  )
+    return img;
+  if (typeof img === "string") return `http://127.0.0.1:8000${img}`;
+  return "/placeholder.svg";
+};
+
+const PlaceView = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [place, setPlace] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentImage, setCurrentImage] = useState(null);
 
-  // Sample tour data - in a real app, this would come from an API
-  const tourData = {
-    id: id || "5-day-sri-lanka",
-    title: "5 Days Tour in Sri Lanka (Hotels with Breakfast & Luxury Car)",
-    pricePerAdult: 460.00,
-    pickupIncluded: true,
-    duration: "5 days",
-    description: "Experience the best of Sri Lanka in this 5-day luxury tour package. Visit cultural landmarks, enjoy beautiful landscapes, and relax in premium accommodations.",
-    highlights: [
-      "Luxury accommodations with breakfast",
-      "Private air-conditioned vehicle",
-      "Professional tour guide",
-      "All entrance fees included",
-      "Small group experience",
-      "Flexible itinerary"
-    ],
-    included: [
-      "Accommodation",
-      "Daily breakfast",
-      "Transport with air-conditioning",
-      "Tour guide",
-      "Airport transfers",
-      "Entrance fees"
-    ],
-    excluded: [
-      "International airfare",
-      "Visa fees",
-      "Travel insurance",
-      "Personal expenses",
-      "Optional excursions"
-    ]
-  };
+  useEffect(() => {
+    setLoading(true);
+    fetch(`http://127.0.0.1:8000/api/places/${id}/`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Not found");
+        return res.json();
+      })
+      .then((data) => {
+        // Map backend fields to frontend model
+        const mapped = {
+          id: data.id,
+          subtitle: data.title, // backend 'title' → frontend 'subtitle'
+          main_image: data.main_image,
+          sub_images: data.sub_images || [],
+          included: data.include, // backend 'include' → frontend 'included'
+          exclude: data.exclude, // backend 'excluded' → frontend 'exclude'
+          tour_highlights: data.tour_highlights, // backend 'tour_highlights' → frontend 'highlights'
+          about_place: data.about_place, // backend 'about_place' → frontend 'description'
+          price: data.price,
+          price_title: data.price_title, // <-- Add this line
+        };
+        setPlace(mapped);
+        setCurrentImage(data.main_image);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [id]);
 
-  const handleLightBox = () => {
-    if (lightbox) {
-      lightbox();
-    }
-  };
-
-  const handleChangeImage = (image) => {
-    setCurrentSlide(image);
-  };
-
-  const handleReserveClick = () => {
-    navigate(`/Forms/${tourData.id}`);
-  };
-
-  const BulletPoint = () => (
-    <svg
-      className="flex-shrink-0 mr-2 mt-1"
-      width="6"
-      height="6"
-      viewBox="0 0 6 6"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <circle cx="3" cy="3" r="3" fill="#FFFFFF" />
-    </svg>
-  );
-
-  const itineraryData = [
-    {
-      day: "Day 01",
-      title: "AIRPORT | KANDY (APPROX. TRAVEL TIME 3.5 HRS)",
-      borderColor: "border-green-500",
-      content: (
-        <>
-          <div className="flex space-x-4 mb-4">
-            <img
-              className="w-64 h-96 object-cover rounded-lg"
-              src={thumbnail3}
-              alt="Elephants bathing in river near Kandy"
-            />
-            <img
-              className="w-64 h-96 object-cover rounded-lg"
-              src={thumbnail3}
-              alt="Elephants bathing in river near Kandy"
-            />
-          </div>
-          <p className="mb-2">
-            Upon arriving in Sri Lanka, transfer direct to Hill Capital Kandy.
-          </p>
-          <div className="bg-green-100 text-green-800 p-4 rounded">
-            <p>
-              En-route visit the Pinnawala Elephant Orphanage. Relax by the
-              poolside. Overnight stay in Kandy.
-            </p>
-          </div>
-        </>
-      ),
-    },
-    {
-      day: "Day 02",
-      title: "KANDY | SIGHTSEEING",
-      borderColor: "border-blue-500",
-      content: (
-        <>
-          <img
-            className="w-full max-w-md rounded-lg mb-4"
-            src={thumbnail2}
-            alt="Temple of the Tooth in Kandy"
-          />
-          <p>
-            Visit the Temple of the Tooth Relic. Explore the Royal Botanical
-            Gardens.
-          </p>
-        </>
-      ),
-    },
-    {
-      day: "Day 03",
-      title: "KANDY | NUWARA ELIYA",
-      borderColor: "border-blue-500",
-      content: (
-        <>
-          <img
-            className="w-full max-w-md rounded-lg mb-4"
-            src={thumbnail1}
-            alt="Tea plantations in Nuwara Eliya"
-          />
-          <p>
-            Travel to Nuwara Eliya. Visit tea plantations. Enjoy the cool
-            climate.
-          </p>
-        </>
-      ),
-    },
-    {
-      day: "Day 04",
-      title: "NUWARA ELIYA | BENTOTA (APPROX. TRAVEL TIME 4 HRS)",
-      borderColor: "border-blue-500",
-      content: (
-        <>
-          <img
-            className="w-full max-w-md rounded-lg mb-4"
-            src={thumbnail4}
-            alt="Beach in Bentota"
-          />
-          <p>
-            Travel to the coastal town of Bentota. Enjoy water sports or relax
-            on beaches.
-          </p>
-        </>
-      ),
-    },
-    {
-      day: "Day 05",
-      title: "BENTOTA | DEPARTURE",
-      borderColor: "border-blue-500",
-      content: (
-        <>
-          <img
-            className="w-full max-w-md rounded-lg mb-4"
-            src={Product4}
-            alt="Sunset in Bentota"
-          />
-          <p>
-            Free time until transfer to the airport for your departure flight.
-          </p>
-        </>
-      ),
-    },
-  ];
-
-  const ItineraryItem = ({ day, title, content, borderColor }) => {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <div className={`border-l-4 p-4 mb-4 ${borderColor} bg-gray-800 rounded`}>
-        <button
-          onClick={() => setOpen(!open)}
-          className="w-full text-left focus:outline-none"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-white font-bold">{day}</h3>
-              <p className="text-gray-300">{title}</p>
-            </div>
-            <span className="text-white">{open ? "−" : "+"}</span>
-          </div>
-        </button>
-        {open && <div className="mt-4 text-sm text-gray-200">{content}</div>}
-      </div>
-    );
-  };
+  if (loading) return <div className="text-center py-20">Loading...</div>;
+  if (!place) return <div className="text-center py-20">Place not found</div>;
 
   return (
     <div className="flex flex-col items-center w-full mt-20 bg-black text-white">
@@ -209,105 +59,111 @@ const ImageSelector = ({ lightbox }) => {
         <div className="relative pt-5 pb-5 w-full">
           <header className="w-full">
             <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              {tourData.title}
+              {place.subtitle}
             </h1>
-            <p className="mt-2 text-sm font-semibold text-gray-300">
-              {tourData.duration} tour package
-            </p>
           </header>
         </div>
-
         {/* Image Section */}
         <div className="flex flex-col gap-8 items-center w-full">
-          <div
-            onClick={handleLightBox}
-            className="cursor-pointer flex justify-center w-full"
-          >
+          <div className="flex justify-center w-full">
             <img
               className="rounded-xl w-full h-auto max-h-[500px] object-cover shadow-2xl"
-              src={currentSlide}
+              src={getImageUrl(currentImage)}
               alt="Main View"
             />
           </div>
           <div className="flex justify-center flex-wrap gap-4 w-full">
-            {[thumbnail1, thumbnail2, thumbnail3, thumbnail4].map(
-              (thumb, idx) => (
+            {/* Main image thumbnail */}
+            <img
+              onClick={() => setCurrentImage(place.main_image)}
+              className={`hover:opacity-70 w-20 h-20 rounded-lg cursor-pointer object-cover border ${
+                currentImage === place.main_image
+                  ? "border-blue-500"
+                  : "border-gray-300"
+              }`}
+              src={getImageUrl(place.main_image)}
+              alt="Main Thumbnail"
+            />
+            {/* Sub images thumbnails */}
+            {Array.isArray(place.sub_images) &&
+              place.sub_images.map((img, idx) => (
                 <img
                   key={idx}
-                  onClick={() =>
-                    handleChangeImage(
-                      [Product1, Product2, Product3, Product4][idx]
-                    )
-                  }
-                  className="hover:opacity-70 w-20 h-20 rounded-lg cursor-pointer object-cover border border-orange-400"
-                  src={thumb}
-                  alt={`Thumbnail ${idx + 1}`}
+                  onClick={() => setCurrentImage(img.image)}
+                  className={`hover:opacity-70 w-20 h-20 rounded-lg cursor-pointer object-cover border ${
+                    currentImage === img.image
+                      ? "border-blue-500"
+                      : "border-gray-300"
+                  }`}
+                  src={getImageUrl(img.image)}
+                  alt={`Sub ${idx + 1}`}
                 />
-              )
-            )}
+              ))}
           </div>
         </div>
-
         {/* Reserve Card Section */}
         <div className="max-w-md w-full rounded-lg shadow-md overflow-hidden border-2 border-white mt-20 bg-gray-900">
           <div className="p-6">
-            <h2 className="text-xl font-bold text-white mb-2">{tourData.title}</h2>
-            
-            {tourData.pickupIncluded && (
-              <div className="flex items-center mb-4">
-                <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                  Pickup included
-                </span>
-              </div>
-            )}
-            
+            <h2 className="text-xl font-bold text-white mb-2">
+             {place.price_title} 
+            </h2>
             <div className="space-y-3 mb-6">
               <div className="flex justify-between">
-                <span className="text-white">2 Adults x ${tourData.pricePerAdult.toFixed(2)}</span>
-                <span className="font-semibold text-white">
-                  Total ${(2 * tourData.pricePerAdult).toFixed(2)}
-                </span>
+                <span className="text-white">Price</span>
+                <span className="font-semibold text-white">Total : ${place.price}</span>
               </div>
-              <p className="text-sm text-white">(Price includes taxes and booking fees)</p>
+              <p className="text-sm text-white">
+                (Price includes taxes and booking fees)
+              </p>
             </div>
-            
-            <button 
-              onClick={handleReserveClick}
+            <button
+              onClick={() => navigate(`/Forms/${place.id}`)}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200"
             >
               Reserve Now
             </button>
           </div>
         </div>
-
         {/* About Section */}
         <main className="py-8 w-full">
           <h2 className="text-xl font-bold mb-4 text-white">About This Tour</h2>
-          <p className="text-gray-300">
-            {tourData.description}
-          </p>
+          <p className="text-gray-300">{place.about_place}</p>
         </main>
-
         {/* Highlights Section */}
         <div className="rounded-lg p-6 mb-8 w-full bg-gray-900">
-          <h2 className="text-2xl font-bold text-white mb-6">TOUR HIGHLIGHTS</h2>
-          <ul className="space-y-3">
-            {tourData.highlights.map((text, index) => (
-              <li key={index} className="flex items-start">
-                <BulletPoint />
-                <span className="text-gray-300">{text}</span>
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-2xl font-bold text-white mb-6">
+            TOUR HIGHLIGHTS
+          </h2>
+          {(() => {
+            let highlights = place.tour_highlights;
+            if (
+              typeof highlights === "string" &&
+              highlights.trim().startsWith("[")
+            ) {
+              try {
+                highlights = JSON.parse(highlights);
+              } catch {}
+            }
+            return Array.isArray(highlights) ? (
+              <ul className="space-y-2 list-disc pl-5">
+                {highlights.map((item, idx) => (
+                  <li key={idx} className="text-gray-300">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-300">{highlights}</p>
+            );
+          })()}
         </div>
-
-        {/* Itinerary Section */}
+{/* 
         <div className="bg-gray-900 w-full mb-10 p-6 rounded-lg">
           <h2 className="text-3xl font-bold text-white mb-6">Tour Itinerary</h2>
           {itineraryData.map((item, idx) => (
             <ItineraryItem key={idx} {...item} />
           ))}
-        </div>
+        </div> */}
 
         {/* Included-Excluded Section */}
         <div className="w-full mb-20 bg-gray-900 p-6 rounded-lg">
@@ -319,21 +175,51 @@ const ImageSelector = ({ lightbox }) => {
               <h3 className="text-xl font-semibold mb-4 text-white">
                 Included
               </h3>
-              <ul className="list-disc pl-5 space-y-2 text-gray-300">
-                {tourData.included.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
+              {(() => {
+                let included = place.included;
+                if (
+                  typeof included === "string" &&
+                  included.trim().startsWith("[")
+                ) {
+                  try {
+                    included = JSON.parse(included);
+                  } catch {}
+                }
+                return Array.isArray(included) ? (
+                  <ul className="list-disc pl-5 space-y-2 text-gray-300">
+                    {included.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-300">{included}</p>
+                );
+              })()}
             </div>
             <div>
               <h3 className="text-xl font-semibold mb-4 text-white">
                 Excluded
               </h3>
-              <ul className="list-disc pl-5 space-y-2 text-gray-300">
-                {tourData.excluded.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
+              {(() => {
+                let excluded = place.exclude;
+                if (
+                  typeof excluded === "string" &&
+                  excluded.trim().startsWith("[")
+                ) {
+                  try {
+                    excluded = JSON.parse(excluded);
+                  } catch {}
+                }
+                return Array.isArray(excluded) ? (
+                  <ul className="list-disc pl-5 space-y-2 text-gray-300">
+                    {excluded.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-300">{excluded}</p>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -343,8 +229,4 @@ const ImageSelector = ({ lightbox }) => {
   );
 };
 
-ImageSelector.propTypes = {
-  lightbox: PropTypes.func,
-};
-
-export default ImageSelector;
+export default PlaceView;
