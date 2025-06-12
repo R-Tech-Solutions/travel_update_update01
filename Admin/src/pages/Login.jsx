@@ -7,14 +7,22 @@ const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
+
+  // Hardcoded credentials for demonstration
+  const allowedEmail = "admin@gmail.com";
+  const allowedPassword = "admin123";
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would typically validate inputs and call an authentication API
-    console.log({ email, password, rememberMe });
-
-    onLogin(); // ✅ sets isAuthenticated to true
-    navigate("/"); // ✅ redirects to home
+    // Check email and password against allowed credentials
+    if (email === allowedEmail && password === allowedPassword) {
+      setError("");
+      onLogin && onLogin();
+      navigate("/");
+    } else {
+      setError("Invalid email or password.");
+    }
   };
 
   return (
@@ -48,7 +56,7 @@ const Login = ({ onLogin }) => {
               onChange={(e) => setPassword(e.target.value)}
               className="inline-block w-full p-4 leading-6 text-lg font-extrabold placeholder-indigo-900 bg-white shadow border-2 border-indigo-900 rounded"
               type="password"
-              placeholder="**********"
+              placeholder="password"
               required
             />
           </div>

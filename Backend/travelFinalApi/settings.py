@@ -167,3 +167,15 @@ CORS_ALLOW_HEADERS = [
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20 MB
 
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'm.mohamed.shinan@gmail.com'  # Your Gmail address
+EMAIL_HOST_PASSWORD = 'ensvtyzpcyjdjnco'  # Your Gmail app password
+DEFAULT_FROM_EMAIL = 'm.mohamed.shinan@gmail.com'  # Your Gmail address
+EMAIL_USE_SSL = False
+
+# For development/testing, you can use the console backend
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 

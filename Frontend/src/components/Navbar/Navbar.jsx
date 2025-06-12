@@ -12,16 +12,16 @@ export const NavbarLinks = [
     link: "/",
   },
   {
-    name: "About",
-    link: "/about",
+    name: "Service",
+    link: "/Service",
   },
   {
-    name: "Blogs",
-    link: "/blogs",
+    name: "Blog",
+    link: "/Blog",
   },
   {
-    name: "Best Places",
-    link: "/best-places",
+    name: "Gellery",
+    link: "/Gellery",
   },
 ];
 
@@ -104,7 +104,7 @@ const Navbar = ({ handleOrderPopup }) => {
                   </NavLink>
                 </li>
                 <li className="py-5 px-3 hover:text-primary transition-colors">
-                  <NavLink to="/about" activeClassName="active">
+                  <NavLink to="/gellery" activeClassName="active">
                     Gallery
                   </NavLink>
                 </li>

@@ -30,7 +30,7 @@ const Button = ({
   return (
     <button
       type={type}
-      className={`rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 
+      className={`rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
         ${variantClasses[variant]} 
         ${sizeClasses[size]} 
         ${disabled ? "opacity-50 cursor-not-allowed" : ""} 
@@ -273,7 +273,14 @@ function AddModal({
   handleArrayFieldChange,
   setShowAdd,
   handleAddPlace,
-  setNewPlace, // <-- add this prop
+  setNewPlace,
+  handleAddItineraryDay,
+  handleRemoveItineraryDay,
+  handleChangeItineraryDayField,
+  handleAddItineraryPhoto,
+  handleRemoveItineraryPhoto,
+  handleChangeItineraryPhoto,
+  handleDeleteItineraryPhoto,
 }) {
   if (!show) return null;
   return (
@@ -327,6 +334,16 @@ function AddModal({
               name="price"
               value={newPlace.price}
               onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <Label htmlFor="package_title">Package Title</Label>
+            <Input
+              id="package_title"
+              name="package_title"
+              value={newPlace.package_title}
+              onChange={handleInputChange}
+              placeholder="Enter package title"
             />
           </div>
         </PlaceFormSection>
@@ -424,6 +441,19 @@ function AddModal({
               addButtonText="Add Exclude"
             />
           </div>
+          <div>
+            <Label>Itinerary</Label>
+            <ItineraryManager
+              itinerary={newPlace.itinerary}
+              onAddDay={handleAddItineraryDay}
+              onRemoveDay={handleRemoveItineraryDay}
+              onChangeDayField={handleChangeItineraryDayField}
+              onAddPhoto={handleAddItineraryPhoto}
+              onRemovePhoto={handleRemoveItineraryPhoto}
+              onPhotoChange={handleChangeItineraryPhoto}
+              onDeletePhoto={handleDeleteItineraryPhoto}
+            />
+          </div>
         </PlaceFormSection>
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={() => setShowAdd(false)}>
@@ -456,14 +486,33 @@ function EditModal({
   handleEditArrayFieldChange,
   setShowEdit,
   handleEditPlace,
+  handleEditAddItineraryDay,
+  handleEditRemoveItineraryDay,
+  handleEditChangeItineraryDayField,
+  handleEditAddItineraryPhoto,
+  handleEditRemoveItineraryPhoto,
+  handleEditChangeItineraryPhoto,
+  handleDeleteItineraryPhoto,
 }) {
   if (!show || !selectedPlace) return null;
+  
+  // Convert itinerary_days to the format expected by the form
+  const itineraryData = selectedPlace.itinerary_days?.map(day => ({
+    id: day?.id || null,
+    day: day?.day || '',
+    sub_iterative_description: day?.sub_iterative_description || '',
+    sub_description: day?.sub_description || '',
+    photos: day?.photos?.map(photo => ({ 
+      id: photo?.id || null,
+      url: photo?.image || null
+    })) || []
+  })) || [];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
         <h2 className="text-xl font-bold mb-4">Edit Place</h2>
         <PlaceFormSection title="Basic Information">
-          {/* ...existing code for basic info... */}
           <div>
             <Label htmlFor="edit-title">Place Name</Label>
             <Input
@@ -508,6 +557,16 @@ function EditModal({
               name="price"
               value={selectedPlace.price}
               onChange={handleEditInputChange}
+            />
+          </div>
+          <div>
+            <Label htmlFor="edit-package_title">Package Title</Label>
+            <Input
+              id="edit-package_title"
+              name="package_title"
+              value={selectedPlace.package_title}
+              onChange={handleEditInputChange}
+              placeholder="Enter package title"
             />
           </div>
         </PlaceFormSection>
@@ -599,6 +658,19 @@ function EditModal({
               addButtonText="Add Exclude"
             />
           </div>
+          <div>
+            <Label>Itinerary</Label>
+            <ItineraryManager
+              itinerary={itineraryData}
+              onAddDay={handleEditAddItineraryDay}
+              onRemoveDay={handleEditRemoveItineraryDay}
+              onChangeDayField={handleEditChangeItineraryDayField}
+              onAddPhoto={handleEditAddItineraryPhoto}
+              onRemovePhoto={handleEditRemoveItineraryPhoto}
+              onPhotoChange={handleEditChangeItineraryPhoto}
+              onDeletePhoto={handleDeleteItineraryPhoto}
+            />
+          </div>
         </PlaceFormSection>
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={() => setShowEdit(false)}>
@@ -615,6 +687,138 @@ function EditModal({
     </div>
   );
 }
+
+// Add this new component above AddPlace
+const ItineraryManager = ({
+  itinerary,
+  onAddDay,
+  onRemoveDay,
+  onChangeDayField,
+  onAddPhoto,
+  onRemovePhoto,
+  onPhotoChange,
+  onDeletePhoto,
+}) => (
+  <div>
+    {itinerary.map((day, idx) => (
+      <div key={idx} className="border rounded-md p-4 mb-4">
+        <div className="flex items-center mb-2">
+          <Label className="mr-2">Day</Label>
+          <Input
+            type="number"
+            min={1}
+            value={day.day}
+            onChange={(e) => onChangeDayField(idx, "day", e.target.value)}
+            className="w-20 mr-4"
+            placeholder="Day"
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onRemoveDay(idx)}
+            className="ml-2 text-red-500"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="mb-2 flex items-center">
+          <Label className="mr-2">Sub Iterative Description</Label>
+          <Input
+            type="text"
+            value={day.sub_iterative_description || ""}
+            onChange={(e) => onChangeDayField(idx, "sub_iterative_description", e.target.value)}
+            className="flex-1"
+            placeholder="Sub Iterative Description"
+          />
+        </div>
+        <div className="mb-2">
+          <Label>Sub Description</Label>
+          <Textarea
+            value={day.sub_description}
+            onChange={(e) => onChangeDayField(idx, "sub_description", e.target.value)}
+            rows={2}
+          />
+        </div>
+        <div>
+          <Label>Photos</Label>
+          <div>
+            {day.photos.map((photo, pIdx) => (
+              <div key={pIdx} className="flex items-center mb-2">
+                {photo && (
+                  <div className="w-12 h-12 mr-2 border rounded overflow-hidden">
+                    <img
+                      src={
+                        photo instanceof File
+                          ? URL.createObjectURL(photo)
+                          : photo?.url
+                          ? getImageUrl(photo)
+                          : "/placeholder.svg?height=48&width=48"
+                      }
+                      alt={`Itinerary Photo ${pIdx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  onChange={(e) =>
+                    e.target.files?.[0] &&
+                    onPhotoChange(idx, pIdx, e.target.files[0])
+                  }
+                  className="flex-1"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (photo?.id) {
+                      // If photo has an ID, it's an existing photo in the database
+                      onDeletePhoto(day.id, photo.id);
+                    } else {
+                      // If no ID, it's a new photo that hasn't been saved yet
+                      onRemovePhoto(idx, pIdx);
+                    }
+                  }}
+                  className="ml-2 text-red-500"
+                  disabled={day.photos.length <= 1}
+                  title={
+                    day.photos.length <= 1
+                      ? "At least one photo required"
+                      : "Remove"
+                  }
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onAddPhoto(idx)}
+              className="mt-2"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Photo
+            </Button>
+          </div>
+        </div>
+      </div>
+    ))}
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={onAddDay}
+      className="mt-2"
+    >
+      <Plus className="h-4 w-4 mr-2" />
+      Add Itinerary Day
+    </Button>
+  </div>
+);
+
+// itinerative end
 
 // Main Component
 function AddPlace() {
@@ -640,11 +844,13 @@ function AddPlace() {
     about_place: "",
     place_type: "",
     price_title: "",
+    package_title: "",
     main_image: null,
     sub_images: [],
     highlights: [],
     includeText: [],
     excludeText: [],
+    itinerary: [],
   });
 
   // --- CRUD Functions ---
@@ -668,13 +874,7 @@ function AddPlace() {
 
   // Add new place
   const handleAddPlace = async () => {
-    // Remove this block or add a user message if validation fails
-    if (
-      !newPlace.title ||
-      !newPlace.subtitle ||
-      !newPlace.place_type ||
-      !newPlace.price
-    ) {
+    if (!newPlace.title || !newPlace.subtitle || !newPlace.place_type || !newPlace.price) {
       alert("Please fill all required fields.");
       return;
     }
@@ -686,28 +886,47 @@ function AddPlace() {
       // Append text fields
       formData.append("title", newPlace.title);
       formData.append("subtitle", newPlace.subtitle);
-      formData.append(
-        "price",
-        newPlace.price === "" ? "" : Number(newPlace.price)
-      );
+      formData.append("price", newPlace.price === "" ? "" : Number(newPlace.price));
       formData.append("about_place", newPlace.about_place);
       formData.append("place_type", newPlace.place_type);
       formData.append("tour_highlights", JSON.stringify(newPlace.highlights));
       formData.append("include", JSON.stringify(newPlace.includeText));
       formData.append("exclude", JSON.stringify(newPlace.excludeText));
       formData.append("price_title", newPlace.price_title);
+      formData.append("package_title", newPlace.package_title);
 
-      // Main image: send as file if available
+      // Handle main image
       if (newPlace.main_image && newPlace.main_image.file) {
         formData.append("main_image", newPlace.main_image.file);
       }
 
-      // Additional photos: send each as a file (skip nulls)
+      // Handle sub images
       newPlace.sub_images
         .filter((imgObj) => imgObj && imgObj.file)
         .forEach((imgObj) => {
           formData.append("sub_images", imgObj.file);
         });
+
+      // Handle itinerary data
+      const itineraryData = newPlace.itinerary.map(day => ({
+        day: day.day,
+        sub_iterative_description: day.sub_iterative_description,
+        sub_description: day.sub_description
+      }));
+      formData.append("itinerary", JSON.stringify(itineraryData));
+
+      // Handle itinerary photos
+      newPlace.itinerary.forEach((day) => {
+        (day.photos || []).forEach((photo, pIdx) => {
+          if (photo && photo.file) {
+            formData.append(
+              "itinerary_photos",
+              photo.file,
+              `day${day.day}_${pIdx}_${photo.file.name}`
+            );
+          }
+        });
+      });
 
       await axios.post("http://127.0.0.1:8000/api/places/create/", formData, {
         headers: {
@@ -725,17 +944,17 @@ function AddPlace() {
         place_type: "",
         main_image: null,
         price_title: "",
+        package_title: "",
         sub_images: [],
         highlights: [],
         includeText: [],
         excludeText: [],
+        itinerary: [],
       });
     } catch (err) {
       setError(err.message);
-      alert(
-        "Failed to add place: " + (err.response?.data?.detail || err.message)
-      );
-      console.error("Error details:", err.response?.data); // Log detailed error
+      alert("Failed to add place: " + (err.response?.data?.detail || err.message));
+      console.error("Error details:", err.response?.data);
     } finally {
       setLoading(false);
     }
@@ -774,25 +993,12 @@ function AddPlace() {
       formData.append("place_type", selectedPlace.place_type);
       formData.append("price_title", selectedPlace.price_title);
 
-      // Only send main_image if it's a new file
+      // Handle main image
       if (selectedPlace.main_image && selectedPlace.main_image.file) {
         formData.append("main_image", selectedPlace.main_image.file);
       }
 
-      formData.append(
-        "tour_highlights",
-        JSON.stringify(selectedPlace.highlights || [])
-      );
-      formData.append(
-        "include",
-        JSON.stringify(selectedPlace.includeText || [])
-      );
-      formData.append(
-        "exclude",
-        JSON.stringify(selectedPlace.excludeText || [])
-      );
-
-      // Only send new sub_images as files
+      // Handle sub images
       if (selectedPlace.sub_images && selectedPlace.sub_images.length > 0) {
         selectedPlace.sub_images
           .filter((imgObj) => imgObj && imgObj.file)
@@ -800,6 +1006,28 @@ function AddPlace() {
             formData.append("sub_images", imgObj.file);
           });
       }
+
+      // Handle itinerary data
+      const itineraryData = selectedPlace.itinerary_days.map(day => ({
+        id: day.id,
+        day: day.day,
+        sub_iterative_description: day.sub_iterative_description,
+        sub_description: day.sub_description
+      }));
+      formData.append("itinerary", JSON.stringify(itineraryData));
+
+      // Handle itinerary photos
+      selectedPlace.itinerary_days.forEach((day) => {
+        (day.photos || []).forEach((photo, pIdx) => {
+          if (photo && photo.file) {
+            formData.append(
+              "itinerary_photos",
+              photo.file,
+              `day${day.day}_${pIdx}_${photo.file.name}`
+            );
+          }
+        });
+      });
 
       await axios.put(
         `http://127.0.0.1:8000/api/places/${selectedPlace.id}/update/`,
@@ -923,8 +1151,147 @@ function AddPlace() {
       ...prev,
       sub_images: prev.sub_images.filter((_, i) => i !== index),
     }));
-  // Use the renamed function for photo change
-  const handleEditPhotoChangeSingle = handleEditPhotoChange;
+
+  // Itinerary handlers for add
+  const handleAddItineraryDay = () =>
+    setNewPlace((prev) => ({
+      ...prev,
+      itinerary: [
+        ...(prev.itinerary || []),
+        { day: (prev.itinerary?.length || 0) + 1, title: "", description: "", photos: [null] },
+      ],
+    }));
+
+  const handleRemoveItineraryDay = idx =>
+    setNewPlace(prev => ({
+      ...prev,
+      itinerary: prev.itinerary.filter((_, i) => i !== idx),
+    }));
+
+  const handleChangeItineraryDayField = (idx, field, value) =>
+    setNewPlace(prev => ({
+      ...prev,
+      itinerary: prev.itinerary.map((d, i) =>
+        i === idx ? { ...d, [field]: value } : d
+      ),
+    }));
+
+  const handleAddItineraryPhoto = idx =>
+    setNewPlace(prev => ({
+      ...prev,
+      itinerary: prev.itinerary.map((d, i) =>
+        i === idx ? { ...d, photos: [...(d.photos || []), null] } : d
+      ),
+    }));
+
+  const handleRemoveItineraryPhoto = (idx, pIdx) =>
+    setNewPlace(prev => ({
+      ...prev,
+      itinerary: prev.itinerary.map((d, i) =>
+        i === idx
+          ? {
+              ...d,
+              photos: d.photos.length > 1
+                ? d.photos.filter((_, j) => j !== pIdx)
+                : d.photos,
+            }
+          : d
+      ),
+    }));
+
+  const handleChangeItineraryPhoto = (idx, pIdx, file) =>
+    setNewPlace(prev => ({
+      ...prev,
+      itinerary: prev.itinerary.map((d, i) =>
+        i === idx
+          ? {
+              ...d,
+              photos: d.photos.map((p, j) =>
+                j === pIdx ? { file, url: URL.createObjectURL(file), isNew: true } : p
+              ),
+            }
+          : d
+      ),
+    }));
+
+  // Itinerary handlers for edit
+  const handleEditAddItineraryDay = () =>
+    setSelectedPlace((prev) => ({
+      ...prev,
+      itinerary_days: [
+        ...(prev.itinerary_days || []),
+        {
+          day: (prev.itinerary_days?.length || 0) + 1,
+          sub_iterative_description: '',
+          sub_description: '',
+          photos: []
+        }
+      ]
+    }));
+
+  const handleEditRemoveItineraryDay = (idx) =>
+    setSelectedPlace((prev) => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days.filter((_, i) => i !== idx)
+    }));
+
+  const handleEditChangeItineraryDayField = (idx, field, value) =>
+    setSelectedPlace((prev) => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days.map((d, i) =>
+        i === idx ? { ...d, [field]: value } : d
+      )
+    }));
+
+  const handleEditAddItineraryPhoto = (idx) =>
+    setSelectedPlace((prev) => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days.map((d, i) =>
+        i === idx ? { ...d, photos: [...(d.photos || []), null] } : d
+      )
+    }));
+
+  const handleEditRemoveItineraryPhoto = (idx, pIdx) =>
+    setSelectedPlace((prev) => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days.map((d, i) =>
+        i === idx
+          ? {
+              ...d,
+              photos: d.photos.length > 1
+                ? d.photos.filter((_, j) => j !== pIdx)
+                : d.photos
+          }
+        : d
+      )
+    }));
+
+  const handleEditChangeItineraryPhoto = (idx, pIdx, file) =>
+    setSelectedPlace((prev) => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days.map((d, i) =>
+        i === idx
+          ? {
+              ...d,
+              photos: d.photos.map((p, j) =>
+                j === pIdx ? { file, url: URL.createObjectURL(file), isNew: true } : p
+              )
+            }
+          : d
+      )
+    }));
+
+  // Add this new function to handle photo deletion
+  const handleDeleteItineraryPhoto = async (dayId, photoId) => {
+    try {
+      await axios.delete(`http://127.0.0.1:8000/api/places/itinerary-photo/${photoId}/delete/`);
+      // Refresh the place data after deletion
+      fetchPlaces();
+    } catch (err) {
+      console.error('Error deleting photo:', err);
+      setError(err.message);
+    }
+  };
 
   const ViewModal = () =>
     showView &&
@@ -993,6 +1360,14 @@ function AddPlace() {
               <Label>Price</Label>
               <Input
                 value={selectedPlace.price}
+                readOnly
+                className="bg-gray-50"
+              />
+            </div>
+            <div>
+              <Label>Package Title</Label>
+              <Input
+                value={selectedPlace.package_title}
                 readOnly
                 className="bg-gray-50"
               />
@@ -1161,6 +1536,63 @@ function AddPlace() {
                 </div>
               )}
             </div>
+            <div>
+              <Label>Itinerary</Label>
+              <ItineraryManager
+                itinerary={selectedPlace.itinerary}
+                onAddDay={handleEditAddItineraryDay}
+                onRemoveDay={handleEditRemoveItineraryDay}
+                onChangeDayField={handleEditChangeItineraryDayField}
+                onAddPhoto={handleEditAddItineraryPhoto}
+                onRemovePhoto={handleEditRemoveItineraryPhoto}
+                onPhotoChange={handleEditChangeItineraryPhoto}
+                onDeletePhoto={handleDeleteItineraryPhoto}
+              />
+            </div>
+          </PlaceFormSection>
+          <PlaceFormSection title="Itinerary">
+            {selectedPlace.itinerary_days && selectedPlace.itinerary_days.length > 0 ? (
+              selectedPlace.itinerary_days.map((day, idx) => (
+                <div key={idx} className="border rounded-md p-4 mb-4">
+                  <div className="flex items-center mb-2">
+                    <Label className="mr-2">Day {day.day}</Label>
+                  </div>
+                  <div className="mb-2">
+                    <Label>Sub Iterative Description</Label>
+                    <Input
+                      value={day.sub_iterative_description || ""}
+                      readOnly
+                      className="bg-gray-50"
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <Label>Sub Description</Label>
+                    <Textarea
+                      value={day.sub_description || ""}
+                      readOnly
+                      className="bg-gray-50"
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <Label>Photos</Label>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {day.photos && day.photos.map((photo, pIdx) => (
+                        <div key={pIdx} className="border rounded-md p-2">
+                          <img
+                            src={getImageUrl(photo.image)}
+                            alt={`Day ${day.day} Photo ${pIdx + 1}`}
+                            className="w-full h-32 object-cover rounded"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-gray-500 text-sm mt-1">No itinerary data available</div>
+            )}
           </PlaceFormSection>
           <div className="flex justify-end mt-4">
             <Button onClick={() => setShowView(false)}>Close</Button>
@@ -1269,6 +1701,18 @@ function AddPlace() {
                             ? JSON.parse(place.exclude)
                             : place.exclude
                           : [],
+                        itinerary: Array.isArray(place.itinerary)
+                          ? place.itinerary.map((day) => ({
+                              day: day.day,
+                              title: day.title,
+                              description: day.description,
+                              photos: Array.isArray(day.photos)
+                                ? day.photos.map((photo) =>
+                                    photo && photo.image ? { url: photo.image } : null
+                                  )
+                                : [],
+                            }))
+                          : [],
                       });
                       setShowView(true);
                     }}
@@ -1296,7 +1740,14 @@ function AddPlace() {
         handleArrayFieldChange={handleArrayFieldChange}
         setShowAdd={setShowAdd}
         handleAddPlace={handleAddPlace}
-        setNewPlace={setNewPlace} // <-- pass setNewPlace as a prop
+        setNewPlace={setNewPlace}
+        handleAddItineraryDay={handleAddItineraryDay}
+        handleRemoveItineraryDay={handleRemoveItineraryDay}
+        handleChangeItineraryDayField={handleChangeItineraryDayField}
+        handleAddItineraryPhoto={handleAddItineraryPhoto}
+        handleRemoveItineraryPhoto={handleRemoveItineraryPhoto}
+        handleChangeItineraryPhoto={handleChangeItineraryPhoto}
+        handleDeleteItineraryPhoto={handleDeleteItineraryPhoto}
       />
       <EditModal
         show={showEdit}
@@ -1311,6 +1762,13 @@ function AddPlace() {
         handleEditArrayFieldChange={handleEditArrayFieldChange}
         setShowEdit={setShowEdit}
         handleEditPlace={handleEditPlace}
+        handleEditAddItineraryDay={handleEditAddItineraryDay}
+        handleEditRemoveItineraryDay={handleEditRemoveItineraryDay}
+        handleEditChangeItineraryDayField={handleEditChangeItineraryDayField}
+        handleEditAddItineraryPhoto={handleEditAddItineraryPhoto}
+        handleEditRemoveItineraryPhoto={handleEditRemoveItineraryPhoto}
+        handleEditChangeItineraryPhoto={handleEditChangeItineraryPhoto}
+        handleDeleteItineraryPhoto={handleDeleteItineraryPhoto}
       />
       <ViewModal />
     </div>
@@ -1319,8 +1777,13 @@ function AddPlace() {
 
 export default AddPlace;
 
-// This error is from your Django backend, not your React code:
-// SuspiciousFileOperation: Storage can not find an available filename for ".../sub_images\DALLE_...webp". Please make sure that the corresponding file field allows sufficient "max_length".
+
+
+
+
+
+
+
 
 // **How to fix:**
 // 1. In your Django model for the Place or sub_images, the file/image field has a max_length (default is 100).

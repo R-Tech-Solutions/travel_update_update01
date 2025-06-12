@@ -17,9 +17,9 @@ const Sidebar = () => {
     { id: 1, path: "/", name: "Dashboard", icon: FaHome },
     { id: 2, path: "/addplace", name: "AddPlace", icon: CiUser },
     { id: 3, path: "/orders", name: "Orders", icon: LuMessageSquare },
-    { id: 4, path: "/projects", name: "Project", icon: LuUser },
-    { id: 5, path: "/client", name: "Client", icon: LuBox },
-    { id: 6, path: "/work", name: "Work", icon: LuCalendar },
+    { id: 4, path: "/userAccess", name: "UserAccess", icon: LuUser },
+    { id: 5, path: "/gellery", name: "Gellery", icon: LuBox },
+    { id: 6, path: "/Posts", name: "Posts", icon: LuCalendar },
   ];
   return (
     <div className="w-16 md:w-56 fixed left-0 top-0 z-10 h-screen border-r pt-8 px-4 bg-white ">

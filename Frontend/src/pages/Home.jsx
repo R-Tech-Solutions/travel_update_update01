@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Hero from "../components/Hero/Hero";
-import BlogsComp from "../components/Blogs/BlogsComp";
-import Places from "../components/Places/Places";
 import Slider from "../components/Servicess/Slider";
 import OurService from "../components/OurService/OurService";
-import Testimonial from "../components/Testimonial/Testimonial";
+// import Testimonial from "../components/Testimonial/Testimonial";
 import Banner from "../components/Banner/Banner";
 import BannerPic from "../components/BannerPic/BannerPic";
 import BannerImg from "../assets/nature.jpg";
-import Banner2 from "../assets/travel-cover2.jpg";
-import OrderPopup from "../components/OrderPopup/OrderPopup";
+// import OrderPopup from "../components/OrderPopup/OrderPopup";
 
 // Import all video files
 import Video1 from "../assets/homepage/1.mp4";
@@ -18,55 +15,79 @@ import Video3 from "../assets/homepage/3.mp4";
 import Video4 from "../assets/homepage/4.mp4";
 import Video5 from "../assets/homepage/5.mp4";
 
+// Add GSAP imports
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
+
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger, SplitText);
+
 const Home = () => {
   const [orderPopup, setOrderPopup] = React.useState(false);
+  const mainRef = useRef(null);
+
+  useEffect(() => {
+    // Parallax effect for the main content
+    gsap.to(mainRef.current, {
+      yPercent: -30,
+      ease: "none",
+      scrollTrigger: {
+        trigger: mainRef.current,
+        start: "top top",
+        end: "bottom top",
+        scrub: true
+      }
+    });
+  }, []);
 
   const handleOrderPopup = () => {
     setOrderPopup(!orderPopup);
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={mainRef}>
       {/* Hero Section with Video Slider */}
-      <div className="h-[1000px] relative">
+      <div className="relative min-h-screen">
         <VideoSlider />
         <div className="relative z-20">
           <Hero />
         </div>
       </div>
 
-      {/* Rest of your content */}
+      {/* Main content section */}
       <div className="relative z-10">
         <Slider />
         <OurService />
         <BannerPic img={BannerImg} />
         <Banner />
-        <Testimonial />
-        <OrderPopup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />
       </div>
     </div>
   );
 };
 
-
-// VideoSlider component with video shadows and text animation
+// VideoSlider component with enhanced animations
 const VideoSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [textAnimation, setTextAnimation] = useState("animate-fadeIn");
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const textRef = useRef(null);
+  const progressRef = useRef(null);
+  const videoRefs = useRef([]);
 
   const slides = [
     {
       videoSrc: Video1,
       title: "Wonderful.",
       subtitle: "Island",
-      description:"🌴 Wonderful Island — Sri Lanka, a land of breathtaking beauty where golden beaches meet lush mountains. Discover ancient temples, vibrant wildlife, and warm hospitality. From serene tea plantations to rich cultural heritage, every moment on this island is a timeless memory.",
+      description: "🌴 Wonderful Island — Sri Lanka, a land of breathtaking beauty where golden beaches meet lush mountains. Discover ancient temples, vibrant wildlife, and warm hospitality. From serene tea plantations to rich cultural heritage, every moment on this island is a timeless memory.",
     },
     {
       videoSrc: Video2,
       title: "Camping.",
       subtitle: "Enjoy",
       description:
-        "🏕️ Camping — Enjoy the Outdoors Escape into nature’s embrace with the joy of camping. From starlit skies to crackling campfires, experience tranquility in the wild. Whether it’s mountains, forests, or lakesides, every moment outdoors brings adventure, relaxation, and memories that last a lifetime.",
+        "🏕️ Camping — Enjoy the Outdoors Escape into nature's embrace with the joy of camping. From starlit skies to crackling campfires, experience tranquility in the wild. Whether it's mountains, forests, or lakesides, every moment outdoors brings adventure, relaxation, and memories that last a lifetime.",
     },
     {
       videoSrc: Video3,
@@ -89,36 +110,172 @@ const VideoSlider = () => {
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Start fade out animation
-      setTextAnimation("animate-fadeOut");
+    // Initialize video refs array
+    videoRefs.current = videoRefs.current.slice(0, slides.length);
 
-      // After fade out completes, change slide and fade in
-      setTimeout(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-        setTextAnimation("animate-fadeIn");
-      }, 500); // Match this with your animation duration
-    }, 5000);
+    // Progress bar animation
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          handleSlideChange();
+          return 0;
+        }
+        return prev + 0.5;
+      });
+    }, 25);
 
-    return () => clearInterval(interval);
-  }, [slides.length]);
+    // Keyboard navigation
+    const handleKeyPress = (e) => {
+      if (e.key === 'ArrowLeft') {
+        handleSlideChange('prev');
+      } else if (e.key === 'ArrowRight') {
+        handleSlideChange('next');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      clearInterval(progressInterval);
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [currentIndex]);
+
+  useEffect(() => {
+    if (textRef.current) {
+      // Split text animation with enhanced effects
+      const splitTitle = new SplitText(textRef.current.querySelector('h1'), { type: "chars,words" });
+      const splitSubtitle = new SplitText(textRef.current.querySelector('h2'), { type: "chars,words" });
+      const splitDescription = new SplitText(textRef.current.querySelector('p'), { type: "lines" });
+
+      // Title animation with 3D effect
+      gsap.from(splitTitle.chars, {
+        opacity: 0,
+        y: 50,
+        rotationX: 90,
+        duration: 1,
+        stagger: 0.02,
+        ease: "back.out(1.7)",
+        transformOrigin: "0% 50% -50",
+        onComplete: () => {
+          // Add hover effect to title
+          gsap.to(splitTitle.chars, {
+            duration: 0.3,
+            y: -10,
+            stagger: 0.01,
+            ease: "power2.out",
+            paused: true,
+            onComplete: () => {
+              gsap.to(splitTitle.chars, {
+                duration: 0.3,
+                y: 0,
+                stagger: 0.01,
+                ease: "power2.in"
+              });
+            }
+          });
+        }
+      });
+
+      // Subtitle animation with wave effect
+      gsap.from(splitSubtitle.chars, {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        stagger: {
+          amount: 0.5,
+          from: "random"
+        },
+        ease: "elastic.out(1, 0.3)",
+        delay: 0.3
+      });
+
+      // Description animation with fade and slide
+      gsap.from(splitDescription.lines, {
+        opacity: 0,
+        y: 20,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power2.out",
+        delay: 0.6
+      });
+
+      // Add hover effect to subtitle
+      const subtitle = textRef.current.querySelector('h2');
+      subtitle.addEventListener('mouseenter', () => {
+        gsap.to(splitSubtitle.chars, {
+          duration: 0.3,
+          y: -5,
+          stagger: 0.01,
+          ease: "power2.out"
+        });
+      });
+
+      subtitle.addEventListener('mouseleave', () => {
+        gsap.to(splitSubtitle.chars, {
+          duration: 0.3,
+          y: 0,
+          stagger: 0.01,
+          ease: "power2.in"
+        });
+      });
+
+      // Cleanup function
+      return () => {
+        splitTitle.revert();
+        splitSubtitle.revert();
+        splitDescription.revert();
+        subtitle.removeEventListener('mouseenter', () => {});
+        subtitle.removeEventListener('mouseleave', () => {});
+      };
+    }
+  }, [currentIndex]);
+
+  const handleSlideChange = (direction = 'next') => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+
+    const nextIndex = direction === 'next' 
+      ? (currentIndex + 1) % slides.length 
+      : (currentIndex - 1 + slides.length) % slides.length;
+
+    // Fade out current video
+    gsap.to(videoRefs.current[currentIndex], {
+      opacity: 0,
+      duration: 1,
+      ease: "power2.inOut"
+    });
+
+    // Fade in next video
+    gsap.fromTo(videoRefs.current[nextIndex],
+      { opacity: 0 },
+      { 
+        opacity: 1,
+        duration: 1,
+        ease: "power2.inOut",
+        onComplete: () => {
+          setCurrentIndex(nextIndex);
+          setIsTransitioning(false);
+          setProgress(0);
+        }
+      }
+    );
+  };
 
   const handleDotClick = (index) => {
-    setTextAnimation("animate-fadeOut");
-    setTimeout(() => {
-      setCurrentIndex(index);
-      setTextAnimation("animate-fadeIn");
-    }, 500);
+    if (index === currentIndex || isTransitioning) return;
+    handleSlideChange(index > currentIndex ? 'next' : 'prev');
   };
 
   return (
     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-      {/* Video slides */}
+      {/* Video slides with enhanced transitions */}
       {slides.map((slide, index) => (
         <div
           key={index}
-          className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ${
-            index === currentIndex ? "opacity-100" : "opacity-0"
+          ref={el => videoRefs.current[index] = el}
+          className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 pointer-events-none ${
+            index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
           }`}
         >
           <video
@@ -132,37 +289,54 @@ const VideoSlider = () => {
         </div>
       ))}
 
-      {/* Text content with animation */}
+      {/* Enhanced text content with GSAP animations */}
       <div
-        className={`absolute left-10 top-1/2 transform -translate-y-1/2 text-white max-w-md ${textAnimation}`}
+        ref={textRef}
+        className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-white px-2 sm:px-6 z-20 flex flex-col items-center"
+        style={{
+          width: "100%",
+          maxWidth: "100vw",
+          pointerEvents: "auto",
+        }}
       >
-        <h1 className="text-5xl md:text-6xl font-bold mb-2 animate-slideUp text-white">
+        <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-2 text-white text-center break-words leading-tight w-full max-w-[95vw] perspective-1000">
           {slides[currentIndex].title}
         </h1>
-        <h2 className="text-3xl md:text-4xl mb-4 animate-slideUp delay-100">
+        <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-4 text-center break-words leading-tight w-full max-w-[95vw] cursor-pointer">
           {slides[currentIndex].subtitle}
         </h2>
-        <p className="text-xl animate-slideUp delay-200">
+        <p className="text-sm xs:text-base sm:text-lg md:text-xl text-center break-words leading-snug w-full max-w-[95vw]">
           {slides[currentIndex].description}
         </p>
       </div>
 
-      {/* Navigation dots */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-2 z-10">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            className={`w-3 h-3 rounded-full transition-colors ${
-              index === currentIndex ? "bg-white" : "bg-white bg-opacity-50"
-            }`}
-            onClick={() => handleDotClick(index)}
-            aria-label={`Go to slide ${index + 1}`}
+      {/* Enhanced navigation with progress bar */}
+      <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-4 z-10">
+        <div className="w-full max-w-[200px] h-1 bg-white/20 rounded-full overflow-hidden">
+          <div 
+            ref={progressRef}
+            className="h-full bg-white transition-all duration-100"
+            style={{ width: `${progress}%` }}
           />
-        ))}
+        </div>
+        <div className="flex justify-center gap-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                index === currentIndex 
+                  ? "bg-white scale-125" 
+                  : "bg-white bg-opacity-50 hover:bg-opacity-75"
+              }`}
+              onClick={() => handleDotClick(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+      {/* Dynamic gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60"></div>
     </div>
   );
 };

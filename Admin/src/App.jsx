@@ -5,8 +5,10 @@ import AddPlace from "./pages/AddPlace";
 import Login from "./pages/Login";
 import Signup from "./pages/SighnUp"; // ✅ Corrected import
 import Orders  from "./pages/Orders";
+import UserAccess from "./pages/UserAccess";
 import { useState } from "react";
-
+import Gellery from "./pages/Gellery";
+import Posts from "./pages/Posts";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -47,6 +49,9 @@ function App() {
           <Route index element={<Home />} />
           <Route path="AddPlace" element={<AddPlace />} />
           <Route path="Orders" element={<Orders />} />
+          <Route path="UserAccess" element={<UserAccess />} />
+          <Route path="Gellery" element={<Gellery />} />
+          <Route path="Posts" element={<Posts />} />
         </Route>
 
         {/* Catch-all route */}

@@ -12,6 +12,7 @@ import "aos/dist/aos.css";
 import Blog from "./pages/Blog";
 import PlaceView from "./components/Servic/PlaceView";
 import FormComponent from "./components/Servic/Form";
+import Gellery from "./components/Gellery/gellery";
 
 const App = () => {
   React.useEffect(() => {
@@ -35,6 +36,7 @@ const App = () => {
             <Route path="about" element={<About />} />
             <Route path="*" element={<NoPage />} />
             <Route path="Service" element={<Service />} />
+            <Route path="Gellery" element={<Gellery />} />
             <Route path="Blog" element={<Blog />} />
             <Route path="PlaceView/:id" element={<PlaceView />} /> {/* Add this route */}
             <Route path="/Forms/:id" element={<FormComponent />} />
