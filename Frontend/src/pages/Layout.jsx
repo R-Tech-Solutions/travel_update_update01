@@ -4,7 +4,7 @@ import { Outlet, Link } from "react-router-dom";
 import Footer from "../components/Footer/Footer";
 import OrderPopup from "../components/OrderPopup/OrderPopup";
 
-const Layout = () => {
+const Layout = ({ showMenu, setShowMenu }) => {
   const [orderPopup, setOrderPopup] = React.useState(false);
 
   const handleOrderPopup = () => {
@@ -12,7 +12,11 @@ const Layout = () => {
   };
   return (
     <>
-      <Navbar handleOrderPopup={handleOrderPopup} />
+      <Navbar
+        handleOrderPopup={handleOrderPopup}
+        showMenu={showMenu}
+        setShowMenu={setShowMenu}
+      />
       <Outlet />
       <Footer />
       <OrderPopup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />

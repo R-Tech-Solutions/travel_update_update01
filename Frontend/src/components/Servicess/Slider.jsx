@@ -42,7 +42,9 @@ const Slider = () => {
   if (error) return <div className="w-full h-[35vh] bg-black flex items-center justify-center text-white">{error}</div>;
 
   return (
-    <div className="w-full flex flex-col items-center bg-black">
+    <div className="relative w-full flex flex-col items-center bg-black overflow-hidden">
+      {/* Blue blurred circle background effect */}
+      <div className="z-0 absolute opacity-90 rounded-full blur-[200px] w-[40%] h-[40%] bg-blue-600 top-[100px] left-1/5 pointer-events-none" />
       {/* Animated Header with gradient background */}
       <div className="h-[35vh] w-full bg-black flex flex-col items-center justify-center gap-2 pt-4 pb-0">
         <p className="m-0 text-transparent text-3xl sm:text-4xl md:text-5xl font-mono font-medium uppercase animate-text bg-[url('https://images.unsplash.com/photo-1508624217470-5ef0f947d8be?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxM3x8b2NlYW58ZW58MHwwfHx8MTc0Mzc5MjQzNnww&ixlib=rb-4.0.3&q=80&w=1080')] bg-contain bg-clip-text opacity-90 filter contrast-150 tracking-widest leading-none">
@@ -52,7 +54,6 @@ const Slider = () => {
           Sri Lanka
         </p>
       </div>
-
       {/* Grid Layout Section with Image Cards */}
       <section className="w-full py-8">
         <div className="container mx-auto px-4">
@@ -73,7 +74,6 @@ const Slider = () => {
           </div>
         </div>
       </section>
-
       <style jsx>{`
         .card {
           position: relative;
@@ -89,19 +89,16 @@ const Slider = () => {
           box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.1);
           transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
         .card img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
         .card:hover {
           transform: scale(1.05);
           box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2);
         }
-
         .card__content {
           position: absolute;
           top: 0;
@@ -115,23 +112,19 @@ const Slider = () => {
           transform-origin: bottom;
           transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
         .card:hover .card__content {
           transform: rotateX(0deg);
         }
-
         .card__title {
           margin: 0;
           font-size: 24px;
           color: #ffffff;
           font-weight: 700;
         }
-
         .card:hover img {
           scale: 0;
           transform: rotate(-45deg);
         }
-
         .card__description {
           margin: 10px 0 0;
           font-size: 14px;

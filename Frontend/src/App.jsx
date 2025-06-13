@@ -15,6 +15,7 @@ import FormComponent from "./components/Servic/Form";
 import Gellery from "./components/Gellery/gellery";
 
 const App = () => {
+  const [showMenu, setShowMenu] = React.useState(false); // Move menu state to App
   React.useEffect(() => {
     AOS.init({
       offset: 100,
@@ -28,8 +29,8 @@ const App = () => {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
+          <Route path="/" element={<Layout showMenu={showMenu} setShowMenu={setShowMenu} />}> {/* Pass menu state to Layout */}
+            <Route index element={<Home showMenu={showMenu} setShowMenu={setShowMenu} />} />
             {/* <Route path="blogs" element={<Blogs />} /> */}
             {/* <Route path="blogs/:id" element={<BlogsDetails />} /> */}
             <Route path="best-places" element={<PlacesRoute />} />

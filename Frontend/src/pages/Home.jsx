@@ -16,37 +16,49 @@ import Video4 from "../assets/homepage/4.mp4";
 import Video5 from "../assets/homepage/5.mp4";
 
 // Add GSAP imports
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
+// import gsap from "gsap";
+// import { ScrollTrigger } from "gsap/ScrollTrigger";
+// import { SplitText } from "gsap/SplitText";
 
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger, SplitText);
+// // Register GSAP plugins
+// gsap.registerPlugin(ScrollTrigger, SplitText);
 
-const Home = () => {
+const Home = ({ showMenu, setShowMenu }) => {
   const [orderPopup, setOrderPopup] = React.useState(false);
   const mainRef = useRef(null);
 
-  useEffect(() => {
-    // Parallax effect for the main content
-    gsap.to(mainRef.current, {
-      yPercent: -30,
-      ease: "none",
-      scrollTrigger: {
-        trigger: mainRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: true
-      }
-    });
-  }, []);
+  // useEffect(() => {
+  //   // Parallax effect for the main content
+  //   gsap.to(mainRef.current, {
+  //     yPercent: -30,
+  //     ease: "none",
+  //     scrollTrigger: {
+  //       trigger: mainRef.current,
+  //       start: "top top",
+  //       end: "bottom top",
+  //       scrub: true
+  //     }
+  //   });
+  // }, []);
 
   const handleOrderPopup = () => {
     setOrderPopup(!orderPopup);
   };
 
+  // Listen for menu close on route change (for mobile nav)
+  React.useEffect(() => {
+    if (showMenu) {
+      const closeMenuOnRoute = () => setShowMenu(false);
+      window.addEventListener('popstate', closeMenuOnRoute);
+      return () => window.removeEventListener('popstate', closeMenuOnRoute);
+    }
+  }, [showMenu, setShowMenu]);
+
   return (
-    <div className="relative" ref={mainRef}>
+    <div className={`relative min-h-screen bg-gradient-to-b from-black via-black to-blue-900 ${showMenu ? 'overflow-hidden' : 'overflow-x-hidden'}`}
+    >
+      {/* Blue blurred circle background effect centered, smaller and only in the center */}
+      <div className="z-0 absolute opacity-80 rounded-full blur-[120px] w-[300px] h-[300px] bg-blue-500 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
       {/* Hero Section with Video Slider */}
       <div className="relative min-h-screen">
         <VideoSlider />
@@ -109,162 +121,43 @@ const VideoSlider = () => {
     },
   ];
 
+  // Progress bar and auto-slide logic
   useEffect(() => {
-    // Initialize video refs array
-    videoRefs.current = videoRefs.current.slice(0, slides.length);
-
-    // Progress bar animation
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
+    if (isTransitioning) return;
+    const interval = setInterval(() => {
+      setProgress((prev) => {
         if (prev >= 100) {
-          handleSlideChange();
+          handleSlideChange('next');
           return 0;
         }
         return prev + 0.5;
       });
     }, 25);
+    return () => clearInterval(interval);
+  }, [currentIndex, isTransitioning]);
 
-    // Keyboard navigation
-    const handleKeyPress = (e) => {
-      if (e.key === 'ArrowLeft') {
-        handleSlideChange('prev');
-      } else if (e.key === 'ArrowRight') {
-        handleSlideChange('next');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-
-    return () => {
-      clearInterval(progressInterval);
-      window.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [currentIndex]);
-
-  useEffect(() => {
-    if (textRef.current) {
-      // Split text animation with enhanced effects
-      const splitTitle = new SplitText(textRef.current.querySelector('h1'), { type: "chars,words" });
-      const splitSubtitle = new SplitText(textRef.current.querySelector('h2'), { type: "chars,words" });
-      const splitDescription = new SplitText(textRef.current.querySelector('p'), { type: "lines" });
-
-      // Title animation with 3D effect
-      gsap.from(splitTitle.chars, {
-        opacity: 0,
-        y: 50,
-        rotationX: 90,
-        duration: 1,
-        stagger: 0.02,
-        ease: "back.out(1.7)",
-        transformOrigin: "0% 50% -50",
-        onComplete: () => {
-          // Add hover effect to title
-          gsap.to(splitTitle.chars, {
-            duration: 0.3,
-            y: -10,
-            stagger: 0.01,
-            ease: "power2.out",
-            paused: true,
-            onComplete: () => {
-              gsap.to(splitTitle.chars, {
-                duration: 0.3,
-                y: 0,
-                stagger: 0.01,
-                ease: "power2.in"
-              });
-            }
-          });
-        }
-      });
-
-      // Subtitle animation with wave effect
-      gsap.from(splitSubtitle.chars, {
-        opacity: 0,
-        y: 30,
-        duration: 0.8,
-        stagger: {
-          amount: 0.5,
-          from: "random"
-        },
-        ease: "elastic.out(1, 0.3)",
-        delay: 0.3
-      });
-
-      // Description animation with fade and slide
-      gsap.from(splitDescription.lines, {
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power2.out",
-        delay: 0.6
-      });
-
-      // Add hover effect to subtitle
-      const subtitle = textRef.current.querySelector('h2');
-      subtitle.addEventListener('mouseenter', () => {
-        gsap.to(splitSubtitle.chars, {
-          duration: 0.3,
-          y: -5,
-          stagger: 0.01,
-          ease: "power2.out"
-        });
-      });
-
-      subtitle.addEventListener('mouseleave', () => {
-        gsap.to(splitSubtitle.chars, {
-          duration: 0.3,
-          y: 0,
-          stagger: 0.01,
-          ease: "power2.in"
-        });
-      });
-
-      // Cleanup function
-      return () => {
-        splitTitle.revert();
-        splitSubtitle.revert();
-        splitDescription.revert();
-        subtitle.removeEventListener('mouseenter', () => {});
-        subtitle.removeEventListener('mouseleave', () => {});
-      };
-    }
-  }, [currentIndex]);
-
+  // Slide change handler
   const handleSlideChange = (direction = 'next') => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-
-    const nextIndex = direction === 'next' 
-      ? (currentIndex + 1) % slides.length 
-      : (currentIndex - 1 + slides.length) % slides.length;
-
-    // Fade out current video
-    gsap.to(videoRefs.current[currentIndex], {
-      opacity: 0,
-      duration: 1,
-      ease: "power2.inOut"
-    });
-
-    // Fade in next video
-    gsap.fromTo(videoRefs.current[nextIndex],
-      { opacity: 0 },
-      { 
-        opacity: 1,
-        duration: 1,
-        ease: "power2.inOut",
-        onComplete: () => {
-          setCurrentIndex(nextIndex);
-          setIsTransitioning(false);
-          setProgress(0);
-        }
-      }
-    );
+    let nextIndex;
+    if (direction === 'next') {
+      nextIndex = (currentIndex + 1) % slides.length;
+    } else if (direction === 'prev') {
+      nextIndex = (currentIndex - 1 + slides.length) % slides.length;
+    } else if (typeof direction === 'number') {
+      nextIndex = direction;
+    }
+    setTimeout(() => {
+      setCurrentIndex(nextIndex);
+      setIsTransitioning(false);
+      setProgress(0);
+    }, 400); // match transition duration
   };
 
   const handleDotClick = (index) => {
     if (index === currentIndex || isTransitioning) return;
-    handleSlideChange(index > currentIndex ? 'next' : 'prev');
+    handleSlideChange(index);
   };
 
   return (
