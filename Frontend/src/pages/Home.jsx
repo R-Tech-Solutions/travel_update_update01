@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
+import PropTypes from 'prop-types';
 import Hero from "../components/Hero/Hero";
 import Slider from "../components/Servicess/Slider";
 import OurService from "../components/OurService/OurService";
@@ -6,6 +7,7 @@ import OurService from "../components/OurService/OurService";
 import Banner from "../components/Banner/Banner";
 import BannerPic from "../components/BannerPic/BannerPic";
 import BannerImg from "../assets/nature.jpg";
+import SplashCursor from "../components/SplashCursor/SplashCursor";
 // import OrderPopup from "../components/OrderPopup/OrderPopup";
 
 // Import all video files
@@ -24,27 +26,6 @@ import Video5 from "../assets/homepage/5.mp4";
 // gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const Home = ({ showMenu, setShowMenu }) => {
-  const [orderPopup, setOrderPopup] = React.useState(false);
-  const mainRef = useRef(null);
-
-  // useEffect(() => {
-  //   // Parallax effect for the main content
-  //   gsap.to(mainRef.current, {
-  //     yPercent: -30,
-  //     ease: "none",
-  //     scrollTrigger: {
-  //       trigger: mainRef.current,
-  //       start: "top top",
-  //       end: "bottom top",
-  //       scrub: true
-  //     }
-  //   });
-  // }, []);
-
-  const handleOrderPopup = () => {
-    setOrderPopup(!orderPopup);
-  };
-
   // Listen for menu close on route change (for mobile nav)
   React.useEffect(() => {
     if (showMenu) {
@@ -55,8 +36,8 @@ const Home = ({ showMenu, setShowMenu }) => {
   }, [showMenu, setShowMenu]);
 
   return (
-    <div className={`relative min-h-screen bg-gradient-to-b from-black via-black to-blue-900 ${showMenu ? 'overflow-hidden' : 'overflow-x-hidden'}`}
-    >
+    <div className={`relative min-h-screen bg-gradient-to-b from-black via-black to-blue-900 ${showMenu ? 'overflow-hidden' : 'overflow-x-hidden'}`}>
+      <SplashCursor />
       {/* Blue blurred circle background effect centered, smaller and only in the center */}
       <div className="z-0 absolute opacity-80 rounded-full blur-[120px] w-[300px] h-[300px] bg-blue-500 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
       {/* Hero Section with Video Slider */}
@@ -78,14 +59,19 @@ const Home = ({ showMenu, setShowMenu }) => {
   );
 };
 
+Home.propTypes = {
+  showMenu: PropTypes.bool.isRequired,
+  setShowMenu: PropTypes.func.isRequired
+};
+
 // VideoSlider component with enhanced animations
 const VideoSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [progress, setProgress] = useState(0);
-  const textRef = useRef(null);
-  const progressRef = useRef(null);
-  const videoRefs = useRef([]);
+  const textRef = React.useRef(null);
+  const progressRef = React.useRef(null);
+  const videoRefs = React.useRef([]);
 
   const slides = [
     {

@@ -12,7 +12,6 @@ const ResponsiveMenu = ({ showMenu, setShowMenu }) => {
       } fixed bottom-0 top-0 z-20 flex h-screen w-[80vw] max-w-xs flex-col justify-between bg-black text-white px-6 pb-6 pt-16 transition-all duration-300 md:hidden rounded-r-3xl shadow-2xl border-r-2 border-blue-700/40`}
     >
       <div className="card">
-        
         <nav className="mt-8">
           <ul className="space-y-4 text-xl">
             {NavbarLinks.map((data, index) => (

@@ -1,0 +1,75 @@
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.social-icon-btn {
+  position: relative;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.social-icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.social-icon-btn__back {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transition: opacity 0.3s ease;
+}
+
+.social-icon-btn__front {
+  position: absolute;
+  inset: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.social-icon-btn:hover .social-icon-btn__front {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.social-icon-btn__icon {
+  color: white;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.social-icon-btn:hover .social-icon-btn__icon {
+  transform: scale(1.1);
+}
+
+/* Gradient backgrounds for each social media */
+.facebook-gradient {
+  background: linear-gradient(135deg, #1877f2, #0d6efd);
+}
+
+.twitter-gradient {
+  background: linear-gradient(135deg, #1da1f2, #0d8ecf);
+}
+
+.instagram-gradient {
+  background: linear-gradient(135deg, #e1306c, #833ab4);
+}
+
+.linkedin-gradient {
+  background: linear-gradient(135deg, #0077b5, #005582);
+}
+
+.youtube-gradient {
+  background: linear-gradient(135deg, #ff0000, #cc0000);
+} 

@@ -57,7 +57,7 @@ const Footer = () => {
                   href="#"
                   className="block text-2xl font-medium hover:opacity-75 sm:text-3xl"
                 >
-                  0123456789
+                  0756805032
                 </a>
               </p>
 
@@ -189,10 +189,10 @@ const Footer = () => {
                 <ul className="mt-6 space-y-4 text-sm text-gray-300">
                   <li>
                     <a
-                      href="#"
+                      href="<Service />"
                       className="transition hover:opacity-75"
                     >
-                      1on1 Coaching
+                      Service
                     </a>
                   </li>
 
