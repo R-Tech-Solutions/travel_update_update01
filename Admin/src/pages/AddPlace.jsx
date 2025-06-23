@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Eye, Trash2, Edit, Plus, X } from "lucide-react";
 import axios from "axios";
+import { BackendUrl } from "../BackendUrl";
 
 // Reusable UI Components
 const Button = ({
@@ -243,16 +244,14 @@ const getImageUrl = (file) => {
     if (file.url.startsWith("http")) return file.url;
     // If url is a media path, prepend backend URL
     if (file.url.startsWith("/media/") || file.url.startsWith("media/")) {
-      return `http://127.0.0.1:8000${file.url.startsWith("/") ? "" : "/"}${
-        file.url
-      }`;
+      return `${BackendUrl}${file.url.startsWith("/") ? "" : "/"}${file.url}`;
     }
     return file.url;
   }
   if (typeof file === "string") {
     if (file.startsWith("http")) return file;
     if (file.startsWith("/media/") || file.startsWith("media/")) {
-      return `http://127.0.0.1:8000${file.startsWith("/") ? "" : "/"}${file}`;
+      return `${BackendUrl}${file.startsWith("/") ? "" : "/"}${file}`;
     }
     return file;
   }
@@ -495,18 +494,20 @@ function EditModal({
   handleDeleteItineraryPhoto,
 }) {
   if (!show || !selectedPlace) return null;
-  
+
   // Convert itinerary_days to the format expected by the form
-  const itineraryData = selectedPlace.itinerary_days?.map(day => ({
-    id: day?.id || null,
-    day: day?.day || '',
-    sub_iterative_description: day?.sub_iterative_description || '',
-    sub_description: day?.sub_description || '',
-    photos: day?.photos?.map(photo => ({ 
-      id: photo?.id || null,
-      url: photo?.image || null
-    })) || []
-  })) || [];
+  const itineraryData =
+    selectedPlace.itinerary_days?.map((day) => ({
+      id: day?.id || null,
+      day: day?.day || "",
+      sub_iterative_description: day?.sub_iterative_description || "",
+      sub_description: day?.sub_description || "",
+      photos:
+        day?.photos?.map((photo) => ({
+          id: photo?.id || null,
+          url: photo?.image || null,
+        })) || [],
+    })) || [];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -726,7 +727,9 @@ const ItineraryManager = ({
           <Input
             type="text"
             value={day.sub_iterative_description || ""}
-            onChange={(e) => onChangeDayField(idx, "sub_iterative_description", e.target.value)}
+            onChange={(e) =>
+              onChangeDayField(idx, "sub_iterative_description", e.target.value)
+            }
             className="flex-1"
             placeholder="Sub Iterative Description"
           />
@@ -735,7 +738,9 @@ const ItineraryManager = ({
           <Label>Sub Description</Label>
           <Textarea
             value={day.sub_description}
-            onChange={(e) => onChangeDayField(idx, "sub_description", e.target.value)}
+            onChange={(e) =>
+              onChangeDayField(idx, "sub_description", e.target.value)
+            }
             rows={2}
           />
         </div>
@@ -859,7 +864,7 @@ function AddPlace() {
   const fetchPlaces = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://127.0.0.1:8000/api/places/");
+      const res = await axios.get(`${BackendUrl}/api/places/`);
       setPlaces(res.data);
     } catch (err) {
       setError(err.message);
@@ -874,7 +879,12 @@ function AddPlace() {
 
   // Add new place
   const handleAddPlace = async () => {
-    if (!newPlace.title || !newPlace.subtitle || !newPlace.place_type || !newPlace.price) {
+    if (
+      !newPlace.title ||
+      !newPlace.subtitle ||
+      !newPlace.place_type ||
+      !newPlace.price
+    ) {
       alert("Please fill all required fields.");
       return;
     }
@@ -886,7 +896,10 @@ function AddPlace() {
       // Append text fields
       formData.append("title", newPlace.title);
       formData.append("subtitle", newPlace.subtitle);
-      formData.append("price", newPlace.price === "" ? "" : Number(newPlace.price));
+      formData.append(
+        "price",
+        newPlace.price === "" ? "" : Number(newPlace.price)
+      );
       formData.append("about_place", newPlace.about_place);
       formData.append("place_type", newPlace.place_type);
       formData.append("tour_highlights", JSON.stringify(newPlace.highlights));
@@ -908,10 +921,10 @@ function AddPlace() {
         });
 
       // Handle itinerary data
-      const itineraryData = newPlace.itinerary.map(day => ({
+      const itineraryData = newPlace.itinerary.map((day) => ({
         day: day.day,
         sub_iterative_description: day.sub_iterative_description,
-        sub_description: day.sub_description
+        sub_description: day.sub_description,
       }));
       formData.append("itinerary", JSON.stringify(itineraryData));
 
@@ -928,7 +941,7 @@ function AddPlace() {
         });
       });
 
-      await axios.post("http://127.0.0.1:8000/api/places/create/", formData, {
+      await axios.post(`${BackendUrl}/api/places/create/`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -953,7 +966,9 @@ function AddPlace() {
       });
     } catch (err) {
       setError(err.message);
-      alert("Failed to add place: " + (err.response?.data?.detail || err.message));
+      alert(
+        "Failed to add place: " + (err.response?.data?.detail || err.message)
+      );
       console.error("Error details:", err.response?.data);
     } finally {
       setLoading(false);
@@ -1008,11 +1023,11 @@ function AddPlace() {
       }
 
       // Handle itinerary data
-      const itineraryData = selectedPlace.itinerary_days.map(day => ({
+      const itineraryData = selectedPlace.itinerary_days.map((day) => ({
         id: day.id,
         day: day.day,
         sub_iterative_description: day.sub_iterative_description,
-        sub_description: day.sub_description
+        sub_description: day.sub_description,
       }));
       formData.append("itinerary", JSON.stringify(itineraryData));
 
@@ -1030,7 +1045,7 @@ function AddPlace() {
       });
 
       await axios.put(
-        `http://127.0.0.1:8000/api/places/${selectedPlace.id}/update/`,
+        `${BackendUrl}/api/places/${selectedPlace.id}/update/`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -1049,7 +1064,7 @@ function AddPlace() {
   const handleDeletePlace = async (id) => {
     try {
       setLoading(true);
-      await axios.delete(`http://127.0.0.1:8000/api/places/${id}/delete/`);
+      await axios.delete(`${BackendUrl}/api/places/${id}/delete/`);
       fetchPlaces();
       setShowView(false);
       setShowEdit(false);
@@ -1158,26 +1173,31 @@ function AddPlace() {
       ...prev,
       itinerary: [
         ...(prev.itinerary || []),
-        { day: (prev.itinerary?.length || 0) + 1, title: "", description: "", photos: [null] },
+        {
+          day: (prev.itinerary?.length || 0) + 1,
+          title: "",
+          description: "",
+          photos: [null],
+        },
       ],
     }));
 
-  const handleRemoveItineraryDay = idx =>
-    setNewPlace(prev => ({
+  const handleRemoveItineraryDay = (idx) =>
+    setNewPlace((prev) => ({
       ...prev,
       itinerary: prev.itinerary.filter((_, i) => i !== idx),
     }));
 
   const handleChangeItineraryDayField = (idx, field, value) =>
-    setNewPlace(prev => ({
+    setNewPlace((prev) => ({
       ...prev,
       itinerary: prev.itinerary.map((d, i) =>
         i === idx ? { ...d, [field]: value } : d
       ),
     }));
 
-  const handleAddItineraryPhoto = idx =>
-    setNewPlace(prev => ({
+  const handleAddItineraryPhoto = (idx) =>
+    setNewPlace((prev) => ({
       ...prev,
       itinerary: prev.itinerary.map((d, i) =>
         i === idx ? { ...d, photos: [...(d.photos || []), null] } : d
@@ -1185,29 +1205,32 @@ function AddPlace() {
     }));
 
   const handleRemoveItineraryPhoto = (idx, pIdx) =>
-    setNewPlace(prev => ({
+    setNewPlace((prev) => ({
       ...prev,
       itinerary: prev.itinerary.map((d, i) =>
         i === idx
           ? {
               ...d,
-              photos: d.photos.length > 1
-                ? d.photos.filter((_, j) => j !== pIdx)
-                : d.photos,
+              photos:
+                d.photos.length > 1
+                  ? d.photos.filter((_, j) => j !== pIdx)
+                  : d.photos,
             }
           : d
       ),
     }));
 
   const handleChangeItineraryPhoto = (idx, pIdx, file) =>
-    setNewPlace(prev => ({
+    setNewPlace((prev) => ({
       ...prev,
       itinerary: prev.itinerary.map((d, i) =>
         i === idx
           ? {
               ...d,
               photos: d.photos.map((p, j) =>
-                j === pIdx ? { file, url: URL.createObjectURL(file), isNew: true } : p
+                j === pIdx
+                  ? { file, url: URL.createObjectURL(file), isNew: true }
+                  : p
               ),
             }
           : d
@@ -1222,17 +1245,17 @@ function AddPlace() {
         ...(prev.itinerary_days || []),
         {
           day: (prev.itinerary_days?.length || 0) + 1,
-          sub_iterative_description: '',
-          sub_description: '',
-          photos: []
-        }
-      ]
+          sub_iterative_description: "",
+          sub_description: "",
+          photos: [],
+        },
+      ],
     }));
 
   const handleEditRemoveItineraryDay = (idx) =>
     setSelectedPlace((prev) => ({
       ...prev,
-      itinerary_days: prev.itinerary_days.filter((_, i) => i !== idx)
+      itinerary_days: prev.itinerary_days.filter((_, i) => i !== idx),
     }));
 
   const handleEditChangeItineraryDayField = (idx, field, value) =>
@@ -1240,7 +1263,7 @@ function AddPlace() {
       ...prev,
       itinerary_days: prev.itinerary_days.map((d, i) =>
         i === idx ? { ...d, [field]: value } : d
-      )
+      ),
     }));
 
   const handleEditAddItineraryPhoto = (idx) =>
@@ -1248,7 +1271,7 @@ function AddPlace() {
       ...prev,
       itinerary_days: prev.itinerary_days.map((d, i) =>
         i === idx ? { ...d, photos: [...(d.photos || []), null] } : d
-      )
+      ),
     }));
 
   const handleEditRemoveItineraryPhoto = (idx, pIdx) =>
@@ -1258,12 +1281,13 @@ function AddPlace() {
         i === idx
           ? {
               ...d,
-              photos: d.photos.length > 1
-                ? d.photos.filter((_, j) => j !== pIdx)
-                : d.photos
-          }
-        : d
-      )
+              photos:
+                d.photos.length > 1
+                  ? d.photos.filter((_, j) => j !== pIdx)
+                  : d.photos,
+            }
+          : d
+      ),
     }));
 
   const handleEditChangeItineraryPhoto = (idx, pIdx, file) =>
@@ -1274,21 +1298,25 @@ function AddPlace() {
           ? {
               ...d,
               photos: d.photos.map((p, j) =>
-                j === pIdx ? { file, url: URL.createObjectURL(file), isNew: true } : p
-              )
+                j === pIdx
+                  ? { file, url: URL.createObjectURL(file), isNew: true }
+                  : p
+              ),
             }
           : d
-      )
+      ),
     }));
 
   // Add this new function to handle photo deletion
   const handleDeleteItineraryPhoto = async (dayId, photoId) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/places/itinerary-photo/${photoId}/delete/`);
+      await axios.delete(
+        `${BackendUrl}/api/places/itinerary-photo/${photoId}/delete/`
+      );
       // Refresh the place data after deletion
       fetchPlaces();
     } catch (err) {
-      console.error('Error deleting photo:', err);
+      console.error("Error deleting photo:", err);
       setError(err.message);
     }
   };
@@ -1551,7 +1579,8 @@ function AddPlace() {
             </div>
           </PlaceFormSection>
           <PlaceFormSection title="Itinerary">
-            {selectedPlace.itinerary_days && selectedPlace.itinerary_days.length > 0 ? (
+            {selectedPlace.itinerary_days &&
+            selectedPlace.itinerary_days.length > 0 ? (
               selectedPlace.itinerary_days.map((day, idx) => (
                 <div key={idx} className="border rounded-md p-4 mb-4">
                   <div className="flex items-center mb-2">
@@ -1577,21 +1606,24 @@ function AddPlace() {
                   <div>
                     <Label>Photos</Label>
                     <div className="grid grid-cols-3 gap-2 mt-2">
-                      {day.photos && day.photos.map((photo, pIdx) => (
-                        <div key={pIdx} className="border rounded-md p-2">
-                          <img
-                            src={getImageUrl(photo.image)}
-                            alt={`Day ${day.day} Photo ${pIdx + 1}`}
-                            className="w-full h-32 object-cover rounded"
-                          />
-                        </div>
-                      ))}
+                      {day.photos &&
+                        day.photos.map((photo, pIdx) => (
+                          <div key={pIdx} className="border rounded-md p-2">
+                            <img
+                              src={getImageUrl(photo.image)}
+                              alt={`Day ${day.day} Photo ${pIdx + 1}`}
+                              className="w-full h-32 object-cover rounded"
+                            />
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-gray-500 text-sm mt-1">No itinerary data available</div>
+              <div className="text-gray-500 text-sm mt-1">
+                No itinerary data available
+              </div>
             )}
           </PlaceFormSection>
           <div className="flex justify-end mt-4">
@@ -1708,7 +1740,9 @@ function AddPlace() {
                               description: day.description,
                               photos: Array.isArray(day.photos)
                                 ? day.photos.map((photo) =>
-                                    photo && photo.image ? { url: photo.image } : null
+                                    photo && photo.image
+                                      ? { url: photo.image }
+                                      : null
                                   )
                                 : [],
                             }))
@@ -1776,14 +1810,6 @@ function AddPlace() {
 }
 
 export default AddPlace;
-
-
-
-
-
-
-
-
 
 // **How to fix:**
 // 1. In your Django model for the Place or sub_images, the file/image field has a max_length (default is 100).

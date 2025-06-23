@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { BackendUrl } from "../BackendUrl";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
@@ -20,7 +21,7 @@ const Posts = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://127.0.0.1:8000/api/posts/');
+      const response = await axios.get(`${BackendUrl}/api/posts/`);
       setPosts(response.data);
       setError(null);
     } catch (err) {
@@ -63,14 +64,14 @@ const Posts = () => {
 
       if (editingId) {
         // Update existing post
-        await axios.put(`http://127.0.0.1:8000/api/posts/${editingId}/update/`, formDataToSend, {
+        await axios.put(`${BackendUrl}/api/posts/${editingId}/update/`, formDataToSend, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
       } else {
         // Create new post
-        await axios.post('http://127.0.0.1:8000/api/posts/create/', formDataToSend, {
+        await axios.post(`${BackendUrl}/api/posts/create/`, formDataToSend, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -108,7 +109,7 @@ const Posts = () => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
         setLoading(true);
-        await axios.delete(`http://127.0.0.1:8000/api/posts/${postId}/delete/`);
+        await axios.delete(`${BackendUrl}/api/posts/${postId}/delete/`);
         fetchPosts();
         setError(null);
       } catch (err) {
@@ -222,7 +223,7 @@ const Posts = () => {
                 <p className="text-gray-600 mb-4">{post.post_content}</p>
                 {post.post_image && (
                   <img 
-                    src={`http://127.0.0.1:8000${post.post_image}`}
+                    src={`${BackendUrl}${post.post_image}`}
                     alt={post.post_title} 
                     className="w-full h-48 object-cover rounded-md"
                   />

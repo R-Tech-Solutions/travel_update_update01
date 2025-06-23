@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 const Signup = ({ onSignup }) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');

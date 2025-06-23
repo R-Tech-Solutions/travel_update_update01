@@ -2,6 +2,8 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { DateRangePicker } from "rsuite";
 import { ChevronDown, Minus, Plus, Users } from "lucide-react";
+import {BackendUrl} from "../../BackendUrl";
+
 
 const HotelBookingForm = ({
   adults,
@@ -211,7 +213,7 @@ const Form = () => {
   useEffect(() => {
     if (!selectedPlace) {
       setLoading(true);
-      fetch(`http://127.0.0.1:8000/api/places/${id}/`)
+      fetch(`${BackendUrl}/api/places/${id}/`)
         .then((res) => {
           if (!res.ok) throw new Error("Not found");
           return res.json();
@@ -259,7 +261,7 @@ const Form = () => {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/bookings/create/', {
+      const response = await fetch(`${BackendUrl}/api/bookings/create/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -318,7 +320,7 @@ const Form = () => {
         <div className="max-w-4xl mx-auto mb-8 bg-gray-700 rounded-lg overflow-hidden shadow-lg">
           <div className="relative h-48 sm:h-56 md:h-64">
             <img
-              src={selectedPlace.main_image ? `http://127.0.0.1:8000${selectedPlace.main_image}` : "/placeholder.svg"}
+              src={selectedPlace.main_image ? `${BackendUrl}${selectedPlace.main_image}` : "/placeholder.svg"}
               alt={selectedPlace.title}
               className="w-full h-full object-cover"
             />

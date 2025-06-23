@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BackendUrl } from "../BackendUrl";
 
 const UserAccess = () => {
   const [items, setItems] = useState([{ title: '', description: '', imageFile: null }]);
@@ -24,7 +25,7 @@ const UserAccess = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/items/');
+      const response = await fetch(`${BackendUrl}/api/items/`);
       if (!response.ok) throw new Error('Failed to fetch items');
       const data = await response.json();
       setItemsList(data);
@@ -36,7 +37,7 @@ const UserAccess = () => {
   const fetchServices = async () => {
     try {
       // Make sure the endpoint matches your Django backend!
-      const response = await fetch('http://127.0.0.1:8000/api/services/');
+      const response = await fetch(`${BackendUrl}/api/services/`);
       if (!response.ok) {
         // Log the actual status for debugging
         throw new Error('Failed to fetch services: ' + response.status + ' ' + response.statusText);
@@ -66,7 +67,7 @@ const UserAccess = () => {
 
   const handleDeleteItem = async (id) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/items/${id}/delete/`, {
+      const response = await fetch(`${BackendUrl}/api/items/${id}/delete/`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete item');
@@ -112,13 +113,13 @@ const UserAccess = () => {
       let response;
       if (editingIndex) {
         // Update existing item
-        response = await fetch(`http://127.0.0.1:8000/api/items/${editingIndex}/update/`, {
+        response = await fetch(`${BackendUrl}/api/items/${editingIndex}/update/`, {
           method: 'POST',
           body: formData,
         });
       } else {
         // Create new item
-        response = await fetch('http://127.0.0.1:8000/api/items/create/', {
+        response = await fetch(`{BackendUrl}/api/items/create/`, {
           method: 'POST',
           body: formData,
         });
@@ -151,7 +152,7 @@ const UserAccess = () => {
 
   const handleServiceDelete = async (id) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/services/${id}/delete/`, {
+      const response = await fetch(`${BackendUrl}/api/services/${id}/delete/`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete service');
@@ -181,12 +182,12 @@ const UserAccess = () => {
     try {
       let response;
       if (serviceEditingId) {
-        response = await fetch(`http://127.0.0.1:8000/api/services/${serviceEditingId}/update/`, {
+        response = await fetch(`${BackendUrl}/api/services/${serviceEditingId}/update/`, {
           method: 'POST',
           body: formData,
         });
       } else {
-        response = await fetch('http://127.0.0.1:8000/api/services/create/', {
+        response = await fetch(`${BackendUrl}/api/services/create/`, {
           method: 'POST',
           body: formData,
         });
@@ -325,7 +326,7 @@ const UserAccess = () => {
                   <td className="px-4 py-2">
                     {item.image ? (
                       <img 
-                        src={`http://127.0.0.1:8000${item.image}`} 
+                        src={`${BackendUrl}${item.image}`} 
                         alt={item.title} 
                         className="w-16 h-16 object-cover"
                       />

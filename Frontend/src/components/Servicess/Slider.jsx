@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import {BackendUrl} from "../../BackendUrl";
 
 const Slider = () => {
   const [displayText, setDisplayText] = useState("");
@@ -12,7 +13,7 @@ const Slider = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/items/');
+        const response = await axios.get(`${BackendUrl}/api/items/`);
         setItems(response.data);
         setLoading(false);
       } catch (err) {
@@ -61,7 +62,7 @@ const Slider = () => {
             {items.map((item) => (
               <div key={item.id} className="card">
                 <img 
-                  src={`http://127.0.0.1:8000${item.image}`} 
+                  src={`${BackendUrl}${item.image}`} 
                   alt={item.title}
                   className="w-full h-full object-cover"
                 />

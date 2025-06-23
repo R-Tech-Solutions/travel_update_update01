@@ -6,20 +6,31 @@ import Login from "./pages/Login";
 import Signup from "./pages/SighnUp"; // ✅ Corrected import
 import Orders  from "./pages/Orders";
 import UserAccess from "./pages/UserAccess";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Gellery from "./pages/Gellery";
 import Posts from "./pages/Posts";
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem("login") === "true");
+
+  // Sync isAuthenticated with sessionStorage changes (optional, for robustness)
+  useEffect(() => {
+    const handleStorage = () => {
+      setIsAuthenticated(sessionStorage.getItem("login") === "true");
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   // Handle successful login
   const handleLogin = () => {
     setIsAuthenticated(true);
+    sessionStorage.setItem("login", "true");
   };
 
   // Handle logout
   const handleLogout = () => {
     setIsAuthenticated(false);
+    sessionStorage.setItem("login", "false");
   };
 
   // Protected route wrapper

@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
+import {BackendUrl} from "../../BackendUrl";
 
 // Register GSAP plugin
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
@@ -27,7 +28,7 @@ const getImageUrl = (img) => {
   if (typeof img === "string") {
     // Remove any leading slashes to prevent double slashes
     const cleanPath = img.startsWith('/') ? img.substring(1) : img;
-    return `http://127.0.0.1:8000/${cleanPath}`;
+    return `${BackendUrl}/${cleanPath}`;
   }
   
   // Handle File objects (if any)
@@ -176,7 +177,7 @@ export default function TravelService() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://127.0.0.1:8000/api/places/")
+    fetch(`${BackendUrl}/api/places/`)
       .then((res) => res.json())
       .then((data) => {
         setPlaces(data);

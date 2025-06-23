@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import {BackendUrl} from "../../BackendUrl";
+
 
 const galleryImages = [
 	{
@@ -82,7 +84,7 @@ const Gellery = () => {
 	useEffect(() => {
 		async function fetchGalleryPhotos() {
 			try {
-				const res = await fetch("http://127.0.0.1:8000/api/gallery/photos/");
+				const res = await fetch(`${BackendUrl}/api/gallery/photos/`);
 				const data = await res.json();
 				setGalleryPhotos(data);
 			} catch {
@@ -162,7 +164,7 @@ const Gellery = () => {
 													setActiveIndex(idx);
 													setModalOpen(true);
 												}}
-												src={`http://127.0.0.1:8000${img.image}`}
+												src={`${BackendUrl}${img.image}`}
 												alt={`gallery photo ${img.id}`}
 												className="object-cover select-none w-full h-auto bg-gray-200 rounded cursor-zoom-in aspect-[5/6] lg:aspect-[2/3] xl:aspect-[3/4] transition-transform duration-300 hover:scale-105 hover:shadow-2xl"
 												style={{ userSelect: "none" }}
@@ -226,7 +228,7 @@ const Gellery = () => {
 									{/* Image */}
 									{galleryPhotos[activeIndex] && (
 										<img
-											src={`http://127.0.0.1:8000${galleryPhotos[activeIndex].image}`}
+											src={`${BackendUrl}${galleryPhotos[activeIndex].image}`}
 											alt={`gallery photo ${galleryPhotos[activeIndex].id}`}
 											className="object-contain object-center w-full h-full select-none cursor-zoom-out"
 											style={{ userSelect: "none" }}

@@ -1,4 +1,5 @@
 "use client";
+import {BackendUrl} from "../../BackendUrl";
 
 import { useState, useEffect } from "react";
 import {
@@ -55,7 +56,7 @@ export default function ContactSection({ onOrderClick }) {
     const fetchServices = async () => {
       try {
         // Fix: Use correct API endpoint (should be /api/services/, not /services/)
-        const response = await axios.get("http://127.0.0.1:8000/api/services/");
+        const response = await axios.get(`${BackendUrl}/api/services/`);
         setServices(response.data.slice(0, 5));
         setLoading(false);
       } catch (err) {

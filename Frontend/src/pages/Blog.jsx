@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import {BackendUrl} from "../BackendUrl";
 
 const Blog = () => {
   const [blogPosts, setBlogPosts] = useState([]);
@@ -41,7 +42,7 @@ const Blog = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://127.0.0.1:8000/api/posts/');
+      const response = await axios.get(`${BackendUrl}/api/posts/`);
       setBlogPosts(response.data);
       setError(null);
     } catch (err) {
@@ -110,7 +111,8 @@ const Blog = () => {
                 <a href={`/blog/${post.id}`}>
                   <img 
                     className="rounded-t-lg w-full h-48 object-cover" 
-                    src={`http://127.0.0.1:8000${post.post_image}`} 
+                    // src={`http://127.0.0.1:8000${post.post_image}`} 
+                    src={`${BackendUrl}${post.post_image}`} 
                     alt={post.post_title} 
                   />
                 </a>

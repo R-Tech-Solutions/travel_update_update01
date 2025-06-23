@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Gallery.css';
+import { BackendUrl } from "../BackendUrl";
 
 function Gellery() {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -8,7 +9,7 @@ function Gellery() {
 
   // Fetch existing gallery photos from backend
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/gallery/photos/')
+    fetch(`${BackendUrl}/api/gallery/photos/`)
       .then(res => res.json())
       .then(data => setGalleryPhotos(data))
       .catch(() => setGalleryPhotos([]));
@@ -35,7 +36,7 @@ function Gellery() {
       for (let file of selectedFiles) {
         const singleForm = new FormData();
         singleForm.append('image', file);
-        await fetch('http://127.0.0.1:8000/api/gallery/photos/create/', {
+        await fetch(`${BackendUrl}/api/gallery/photos/create/`, {
           method: 'POST',
           body: singleForm,
         });
@@ -45,7 +46,7 @@ function Gellery() {
       setSelectedFiles([]);
       setPreviews([]);
       // Refresh gallery
-      fetch('http://127.0.0.1:8000/api/gallery/photos/')
+      fetch(`${BackendUrl}/api/gallery/photos/`)
         .then(res => res.json())
         .then(data => setGalleryPhotos(data))
         .catch(() => setGalleryPhotos([]));
@@ -63,7 +64,7 @@ function Gellery() {
   // Delete photo from backend
   const handleDeleteGalleryPhoto = async (id) => {
     if (!window.confirm('Delete this photo?')) return;
-    await fetch(`http://127.0.0.1:8000/api/gallery/photos/${id}/delete/`, {
+    await fetch(`${BackendUrl}/api/gallery/photos/${id}/delete/`, {
       method: 'DELETE',
     });
     setGalleryPhotos(galleryPhotos.filter(photo => photo.id !== id));
@@ -113,7 +114,7 @@ function Gellery() {
         <div className="preview-grid">
           {galleryPhotos.map((photo) => (
             <div key={photo.id} className="preview-item">
-              <img src={`http://127.0.0.1:8000${photo.image}`} alt="Gallery" />
+              <img src={`${BackendUrl}${photo.image}`} alt="Gallery" />
               <button
                 className="remove-button"
                 onClick={() => handleDeleteGalleryPhoto(photo.id)}

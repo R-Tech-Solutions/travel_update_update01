@@ -18,6 +18,7 @@ const Login = ({ onLogin }) => {
     // Check email and password against allowed credentials
     if (email === allowedEmail && password === allowedPassword) {
       setError("");
+      sessionStorage.setItem("login", "true");
       onLogin && onLogin();
       navigate("/");
     } else {

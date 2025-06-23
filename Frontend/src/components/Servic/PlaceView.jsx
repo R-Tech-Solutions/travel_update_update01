@@ -2,13 +2,14 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PropTypes from 'prop-types';
 import { motion, useSpring, useMotionValue } from "framer-motion";
+import {BackendUrl} from "../../BackendUrl";
 
 // Helper: get image URL for preview
 const getImageUrl = (img) => {
   if (!img) return "/placeholder.svg";
   if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://")))
     return img;
-  if (typeof img === "string") return `http://127.0.0.1:8000${img}`;
+  if (typeof img === "string") return `${BackendUrl}${img}`;
   return "/placeholder.svg";
 };
 
@@ -153,7 +154,7 @@ const PlaceView = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/places/${id}/`)
+    fetch(`${BackendUrl}/api/places/${id}/`)
       .then((res) => {
         if (!res.ok) throw new Error("Not found");
         return res.json();

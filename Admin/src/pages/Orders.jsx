@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { BackendUrl } from "../BackendUrl";
 
 const Orders = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -8,6 +9,7 @@ const Orders = () => {
   const [error, setError] = useState(null);
   const [approvalStatus, setApprovalStatus] = useState(null);
   const [selectedPlaceDetails, setSelectedPlaceDetails] = useState(null);
+  
 
   useEffect(() => {
     window.scrollTo(0, 0); // Always scroll to top on mount
@@ -17,7 +19,7 @@ const Orders = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://127.0.0.1:8000/api/bookings/');
+      const response = await fetch(`${BackendUrl}/api/bookings/`);
       if (!response.ok) {
         throw new Error('Failed to fetch bookings');
       }
@@ -35,7 +37,7 @@ const Orders = () => {
   const handleApprove = async (bookingId) => {
     try {
       setApprovalStatus('sending');
-      const response = await fetch(`http://127.0.0.1:8000/api/bookings/${bookingId}/update/`, {
+      const response = await fetch(`${BackendUrl}/api/bookings/${bookingId}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +69,7 @@ const Orders = () => {
     // If place is just an ID, fetch details
     if (booking.place && typeof booking.place === "number") {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/places/${booking.place}/`);
+        const res = await fetch(`${BackendUrl}/api/places/${booking.place}/`);
         if (res.ok) {
           const placeData = await res.json();
           setSelectedPlaceDetails(placeData);
@@ -247,7 +249,7 @@ const Orders = () => {
                 <div className="flex items-start space-x-4">
                   {selectedPlaceDetails?.main_image && (
                     <img
-                      src={`http://127.0.0.1:8000${selectedPlaceDetails.main_image}`}
+                      src={`${BackendUrl}${selectedPlaceDetails.main_image}`}
                       alt={selectedPlaceDetails.title}
                       className="w-32 h-32 object-cover rounded-lg"
                     />
