@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-const ProjectStatic = () => {
+const ProjectStatic = ({ totalAmount }) => {
     const options = {
         xaxis: {
             show: true,
@@ -105,7 +105,7 @@ const ProjectStatic = () => {
                 <div className="flex justify-between p-4 md:p-6 pb-0 md:pb-0">
                     <div>
                         <h5 className="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">
-                            $12,423
+                            ${totalAmount?.toLocaleString() || 0}
                         </h5>
                     </div>
                     <div className="flex items-center px-2.5 py-0.5 text-base font-semibold text-green-500 dark:text-green-500 text-center">

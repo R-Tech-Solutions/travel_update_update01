@@ -1,37 +1,22 @@
-import React from "react";
-import FooterLogo from "../../assets/logo.png";
-import {
-  FaFacebook,
-  FaInstagram,
-  FaLinkedin,
-  FaLocationArrow,
-  FaMobileAlt,
-} from "react-icons/fa";
-import NatureVid from "../../assets/video/footer.mp4";
-import { Link } from "react-router-dom";
-import ScrollToTop from "react-scroll-to-top";
+import { useEffect, useState } from "react";
 import FooterLogoImg from "../../assets/plc/img3.jpg";
 
-const FooterLinks = [
-  {
-    title: "Home",
-    link: "/",
-  },
-  {
-    title: "About",
-    link: "/about",
-  },
-  {
-    title: "Best Places",
-    link: "/best-places",
-  },
-  {
-    title: "Blogs",
-    link: "/blogs",
-  },
-];
-
 const Footer = () => {
+  const [contactNumber, setContactNumber] = useState("");
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/contact/")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setContactNumber(data[data.length - 1].contact_number);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch contact number", err);
+      });
+  }, []);
+
   return (
     <>
       <footer className="bg-black text-white lg:grid lg:grid-cols-5">
@@ -54,17 +39,14 @@ const Footer = () => {
                 </span>
 
                 <a
-                  href="#"
+                  href={`tel:${contactNumber}`}
                   className="block text-2xl font-medium hover:opacity-75 sm:text-3xl"
                 >
-                  0756805032
+                  {contactNumber ? contactNumber : "+94 76 977 0470"}
                 </a>
               </p>
 
-              <ul className="mt-8 space-y-1 text-sm text-gray-300">
-                <li>Monday to Friday: 10am - 5pm</li>
-                <li>Weekend: 10am - 3pm</li>
-              </ul>
+            
 
               <ul className="mt-8 flex gap-6">
                 <li>
@@ -303,7 +285,7 @@ const Footer = () => {
               </ul>
 
               <p className="mt-8 text-xs text-gray-400 sm:mt-0">
-                &copy; {new Date().getFullYear()}. Company Name. All rights reserved.
+                &copy; {new Date().getFullYear()}. R-Tech Solutions. All rights reserved.
               </p>
             </div>
           </div>

@@ -164,6 +164,7 @@ const PlaceView = () => {
         const mapped = {
           id: data.id,
           subtitle: data.title,
+          place_history: data.subtitle,
           main_image: data.main_image,
           sub_images: data.sub_images || [],
           included: data.include,
@@ -448,7 +449,7 @@ const PlaceView = () => {
                 <span className="text-white">Price</span>
                 <span className="font-semibold text-white">Total : ${place.price}</span>
               </div>
-              <span className="font-semibold text-white">{place.price_title}</span>
+              <span className="font-semibold text-white">{place.place_history}</span>
               <p className="text-sm text-white/80">
                 (Price includes taxes and booking fees)
               </p>

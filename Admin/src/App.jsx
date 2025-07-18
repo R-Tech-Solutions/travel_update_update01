@@ -9,6 +9,7 @@ import UserAccess from "./pages/UserAccess";
 import { useState, useEffect } from "react";
 import Gellery from "./pages/Gellery";
 import Posts from "./pages/Posts";
+import Settings from "./pages/Setting";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem("login") === "true");
 
@@ -63,6 +64,7 @@ function App() {
           <Route path="UserAccess" element={<UserAccess />} />
           <Route path="Gellery" element={<Gellery />} />
           <Route path="Posts" element={<Posts />} />
+          <Route path="Settings" element={<Settings/>}/>
         </Route>
 
         {/* Catch-all route */}

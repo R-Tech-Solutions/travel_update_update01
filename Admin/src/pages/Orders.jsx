@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BackendUrl } from "../BackendUrl";
+// import ProjectStatic from "../components/ProjectStatic";
+
 
 const Orders = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -115,6 +117,10 @@ const Orders = () => {
     );
   }
 
+  const totalApprovedAmount = bookings
+    .filter(booking => booking.status === 'approved')
+    .reduce((sum, booking) => sum + Number(booking.price), 0);
+
   return (
     <div className="p-4">
       {/* Approval Status Message */}
@@ -131,6 +137,12 @@ const Orders = () => {
           {approvalStatus === 'error' && 'Failed to approve booking. Please try again.'}
         </div>
       )}
+
+      {/* {totalApprovedAmount > 0 && (
+        <div className="mb-6">
+          <ProjectStatic totalAmount={totalApprovedAmount} />
+        </div>
+      )} */}
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left text-gray-700 dark:text-gray-400">

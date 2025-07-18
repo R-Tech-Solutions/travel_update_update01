@@ -1,14 +1,13 @@
 "use client";
-import {BackendUrl} from "../../BackendUrl";
+import { BackendUrl } from "../../BackendUrl";
 
 import { useState, useEffect } from "react";
 import {
   Facebook,
-  Twitter,
   Instagram,
-  Linkedin,
-  Youtube,
+  
 } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { Calendar, Headphones, Heart, HeartPulse, Wallet } from "lucide-react";
 import PropTypes from "prop-types";
 import { motion } from "framer-motion";
@@ -50,6 +49,11 @@ export default function ContactSection({ onOrderClick }) {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [links, setLinks] = useState({
+    facebook_link: "#",
+    whatsapp_link: "#",
+    instagram_link: "#",
+  });
 
   // Fetch services from the backend
   useEffect(() => {
@@ -60,12 +64,21 @@ export default function ContactSection({ onOrderClick }) {
         setServices(response.data.slice(0, 5));
         setLoading(false);
       } catch (err) {
-        setError("Failed to fetch services: " + (err.response?.status || err.message));
+        setError(
+          "Failed to fetch services: " + (err.response?.status || err.message)
+        );
         setLoading(false);
       }
     };
 
     fetchServices();
+  }, []);
+
+  // Fetch social links from the backend
+  useEffect(() => {
+    axios.get("http://localhost:8000/api/social-links/")
+      .then((res) => setLinks(res.data))
+      .catch((err) => console.error("Failed to fetch links", err));
   }, []);
 
   // Fallback for missing services to always show 5 cards
@@ -143,8 +156,6 @@ export default function ContactSection({ onOrderClick }) {
         )}
       </div>
 
-
-
       {/* Google Maps */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -173,7 +184,9 @@ export default function ContactSection({ onOrderClick }) {
         transition={{ duration: 0.8, delay: 0.2 }}
         className="py-6 sm:py-8 text-center"
       >
-        <h3 className="mb-4 text-base font-semibold sm:text-lg md:text-xl">Follow Us</h3>
+        <h3 className="mb-4 text-base font-semibold sm:text-lg md:text-xl">
+          Follow Us
+        </h3>
         <motion.div
           variants={container}
           initial="hidden"
@@ -182,20 +195,23 @@ export default function ContactSection({ onOrderClick }) {
           className="social-icons"
         >
           <motion.div variants={item}>
-            <SocialIcon icon={<Facebook className="h-6 w-6" />} type="facebook" />
+            <a href={links.facebook_link} target="_blank" rel="noopener noreferrer">
+              <SocialIcon icon={<Facebook className="h-6 w-6" />} type="facebook" />
+            </a>
           </motion.div>
+
           <motion.div variants={item}>
-            <SocialIcon icon={<Twitter className="h-6 w-6" />} type="twitter" />
+            <a href={links.whatsapp_link} target="_blank" rel="noopener noreferrer">
+              <SocialIcon icon={<FaWhatsapp className="h-6 w-6" />} type="whatsapp" />
+            </a>
           </motion.div>
+
           <motion.div variants={item}>
-            <SocialIcon icon={<Instagram className="h-6 w-6" />} type="instagram" />
+            <a href={links.instagram_link} target="_blank" rel="noopener noreferrer">
+              <SocialIcon icon={<Instagram className="h-6 w-6" />} type="instagram" />
+            </a>
           </motion.div>
-          <motion.div variants={item}>
-            <SocialIcon icon={<Linkedin className="h-6 w-6" />} type="linkedin" />
-          </motion.div>
-          <motion.div variants={item}>
-            <SocialIcon icon={<Youtube className="h-6 w-6" />} type="youtube" />
-          </motion.div>
+
         </motion.div>
       </motion.div>
     </section>
@@ -225,10 +241,7 @@ ContactInfoCard.propTypes = {
 
 function SocialIcon({ icon, type }) {
   return (
-    <button
-      className="social-icon-btn"
-      aria-label={`Visit our ${type} page`}
-    >
+    <button className="social-icon-btn" aria-label={`Visit our ${type} page`}>
       <span className={`social-icon-btn__back ${type}-gradient`}></span>
       <span className="social-icon-btn__front">
         <span className="social-icon-btn__icon" aria-hidden="true">
@@ -241,10 +254,16 @@ function SocialIcon({ icon, type }) {
 
 SocialIcon.propTypes = {
   icon: PropTypes.node.isRequired,
-  type: PropTypes.string.isRequired
+  type: PropTypes.string.isRequired,
 };
 
-function ServiceCard({ icon, title, description, additionalText, onOrderClick }) {
+function ServiceCard({
+  icon,
+  title,
+  description,
+  additionalText,
+  onOrderClick,
+}) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -293,11 +312,11 @@ ServiceCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   additionalText: PropTypes.string.isRequired,
-  onOrderClick: PropTypes.func.isRequired
+  onOrderClick: PropTypes.func.isRequired,
 };
 
 ContactSection.propTypes = {
-  onOrderClick: PropTypes.func.isRequired
+  onOrderClick: PropTypes.func.isRequired,
 };
 
 // ContactCard component
@@ -305,8 +324,12 @@ function ContactCard({ icon, title, value }) {
   return (
     <div className="w-[100px] hover:scale-[1.1] h-[125px] sm:w-[200px] sm:h-[225px] gap-1 md:gap-4 flex flex-col px-2 py-3 justify-center items-center bg-white bg-opacity-30 rounded-[25px] transition-transform duration-300">
       {icon}
-      <h3 className="text-base capitalize font-black text-white sm:text-[28px]">{title}</h3>
-      <p className="text-sm text-center font-regular text-[#A4A4A5] sm:text-xl">{value}</p>
+      <h3 className="text-base capitalize font-black text-white sm:text-[28px]">
+        {title}
+      </h3>
+      <p className="text-sm text-center font-regular text-[#A4A4A5] sm:text-xl">
+        {value}
+      </p>
     </div>
   );
 }
@@ -314,5 +337,5 @@ function ContactCard({ icon, title, value }) {
 ContactCard.propTypes = {
   icon: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
-  value: PropTypes.node.isRequired
+  value: PropTypes.node.isRequired,
 };

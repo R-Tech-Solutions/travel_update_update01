@@ -210,10 +210,11 @@ export default function TravelService() {
   }, []);
 
   const trendingPlaces = places.filter((p) => p.place_type === "trending");
-  const adventurePlaces = places.filter((p) => p.place_type === "adventure");
-  const hikingPlaces = places.filter((p) => p.place_type === "Hiking");
-  const leisurePlaces = places.filter((p) => p.place_type === "Leisure");
-
+  const five_day = places.filter((p) => p.place_type === "five_day");
+  const ten_day = places.filter((p) => p.place_type === "ten_day");
+  const fifteen_day = places.filter((p) => p.place_type === "fifteen_day");
+  const twenty_day = places.filter((p) => p.place_type === "twenty_day");
+  const twentyfive_day = places.filter((p) => p.place_type === "twentyfive_day");
   // Remove the getTrendingPlace function and use array indices directly
   const trendingPlace1 = trendingPlaces[0] || {};
   const trendingPlace2 = trendingPlaces[1] || {};
@@ -237,186 +238,206 @@ export default function TravelService() {
             style={{ scrollBehavior: "smooth" }} // Enable smooth scroll for anchor navigation
           >
             {/* Trending Section */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              className="mb-16"
-              style={{ marginTop: "80px" }} // Add margin to push Trending below navbar
+           
+            {
+  (trendingPlace1?.main_image || trendingPlace2?.main_image || trendingPlace3?.main_image || trendingPlace4?.main_image || trendingPlace5?.main_image) ? (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.2, ease: "easeOut" }}
+      className="mb-16"
+      style={{ marginTop: "80px" }} // Add margin to push Trending below navbar
+    >
+      <h1 className="text-3xl font-bold mb-6">Trending</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
+        {/* First row - left */}
+        {trendingPlace1?.main_image && (
+          <motion.div
+            className="lg:col-span-4 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[400px]"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+            transition={{
+              duration: 0.8,
+              ease: [0.16, 0.77, 0.47, 0.97],
+              delay: 0.15,
+            }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <img
+              src={getImageUrl(trendingPlace1.main_image)}
+              alt={trendingPlace1.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+              <h3 className="text-xl font-bold mb-2">{trendingPlace1.title}</h3>
+              {trendingPlace1.package_title && (
+                <p className="text-blue-300 mb-2">{trendingPlace1.package_title}</p>
+              )}
+            </div>
+            <button
+              onClick={() => navigate(`/PlaceView/${trendingPlace1.id}`, { state: { place: trendingPlace1 } })}
+              className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
             >
-              <h1 className="text-3xl font-bold mb-6">Trending</h1>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
-                {/* First row - left */}
-                <motion.div
-                  className="lg:col-span-4 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[400px]"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                  transition={{
-                    duration: 0.8,
-                    ease: [0.16, 0.77, 0.47, 0.97],
-                    delay: 0.15,
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <img
-                    src={getImageUrl(trendingPlace1?.main_image)}
-                    alt={trendingPlace1?.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <h3 className="text-xl font-bold mb-2">{trendingPlace1?.title}</h3>
-                    {trendingPlace1?.package_title && (
-                      <p className="text-blue-300 mb-2">{trendingPlace1.package_title}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => navigate(`/PlaceView/${trendingPlace1?.id}`, { state: { place: trendingPlace1 } })}
-                    className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
-                  >
-                    Book Now
-                  </button>
-                </motion.div>
-                {/* First row - middle */}
-                <motion.div
-                  className="lg:col-span-4 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[400px]"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                  transition={{
-                    duration: 0.8,
-                    ease: [0.16, 0.77, 0.47, 0.97],
-                    delay: 0.3,
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <img
-                    src={getImageUrl(trendingPlace2?.main_image)}
-                    alt={trendingPlace2?.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <h3 className="text-xl font-bold mb-2">{trendingPlace2?.title}</h3>
-                    {trendingPlace2?.package_title && (
-                      <p className="text-blue-300 mb-2">{trendingPlace2.package_title}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => navigate(`/PlaceView/${trendingPlace2?.id}`, { state: { place: trendingPlace2 } })}
-                    className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
-                  >
-                    Book Now
-                  </button>
-                </motion.div>
-                {/* Right column */}
-                <motion.div
-                  className="lg:col-span-4 lg:row-span-2 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[800px]"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                  transition={{
-                    duration: 0.8,
-                    ease: [0.16, 0.77, 0.47, 0.97],
-                    delay: 0.45,
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <img
-                    src={getImageUrl(trendingPlace3?.main_image)}
-                    alt={trendingPlace3?.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <h3 className="text-xl font-bold mb-2">{trendingPlace3?.title}</h3>
-                    {trendingPlace3?.package_title && (
-                      <p className="text-blue-300 mb-2">{trendingPlace3.package_title}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => navigate(`/PlaceView/${trendingPlace3?.id}`, { state: { place: trendingPlace3 } })}
-                    className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
-                  >
-                    Book Now
-                  </button>
-                </motion.div>
-                {/* Second row large */}
-                <motion.div
-                  className="lg:col-span-6 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[400px]"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                  transition={{
-                    duration: 0.8,
-                    ease: [0.16, 0.77, 0.47, 0.97],
-                    delay: 0.6,
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <img
-                    src={getImageUrl(trendingPlace4?.main_image)}
-                    alt={trendingPlace4?.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <h3 className="text-xl font-bold mb-2">{trendingPlace4?.title}</h3>
-                    {trendingPlace4?.package_title && (
-                      <p className="text-blue-300 mb-2">{trendingPlace4.package_title}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => navigate(`/PlaceView/${trendingPlace4?.id}`, { state: { place: trendingPlace4 } })}
-                    className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
-                  >
-                    Book Now
-                  </button>
-                </motion.div>
-                {/* Second row smaller */}
-                <motion.div
-                  className="lg:col-span-2 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[400px]"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                  transition={{
-                    duration: 0.8,
-                    ease: [0.16, 0.77, 0.47, 0.97],
-                    delay: 0.75,
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <img
-                    src={getImageUrl(trendingPlace5?.main_image)}
-                    alt={trendingPlace5?.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <h3 className="text-xl font-bold mb-2">{trendingPlace5?.title}</h3>
-                    {trendingPlace5?.package_title && (
-                      <p className="text-blue-300 mb-2">{trendingPlace5.package_title}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => navigate(`/PlaceView/${trendingPlace5?.id}`, { state: { place: trendingPlace5 } })}
-                    className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
-                  >
-                    Book Now
-                  </button>
-                </motion.div>
-              </div>
-            </motion.div>
+              Book Now
+            </button>
+          </motion.div>
+        )}
+        {/* First row - middle */}
+        {trendingPlace2?.main_image && (
+          <motion.div
+            className="lg:col-span-4 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[400px]"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+            transition={{
+              duration: 0.8,
+              ease: [0.16, 0.77, 0.47, 0.97],
+              delay: 0.3,
+            }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <img
+              src={getImageUrl(trendingPlace2.main_image)}
+              alt={trendingPlace2.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+              <h3 className="text-xl font-bold mb-2">{trendingPlace2.title}</h3>
+              {trendingPlace2.package_title && (
+                <p className="text-blue-300 mb-2">{trendingPlace2.package_title}</p>
+              )}
+            </div>
+            <button
+              onClick={() => navigate(`/PlaceView/${trendingPlace2.id}`, { state: { place: trendingPlace2 } })}
+              className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              Book Now
+            </button>
+          </motion.div>
+        )}
+        {/* Right column */}
+        {trendingPlace3?.main_image && (
+          <motion.div
+            className="lg:col-span-4 lg:row-span-2 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[800px]"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+            transition={{
+              duration: 0.8,
+              ease: [0.16, 0.77, 0.47, 0.97],
+              delay: 0.45,
+            }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <img
+              src={getImageUrl(trendingPlace3.main_image)}
+              alt={trendingPlace3.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+              <h3 className="text-xl font-bold mb-2">{trendingPlace3.title}</h3>
+              {trendingPlace3.package_title && (
+                <p className="text-blue-300 mb-2">{trendingPlace3.package_title}</p>
+              )}
+            </div>
+            <button
+              onClick={() => navigate(`/PlaceView/${trendingPlace3.id}`, { state: { place: trendingPlace3 } })}
+              className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              Book Now
+            </button>
+          </motion.div>
+        )}
+        {/* Second row large */}
+        {trendingPlace4?.main_image && (
+          <motion.div
+            className="lg:col-span-6 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[400px]"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+            transition={{
+              duration: 0.8,
+              ease: [0.16, 0.77, 0.47, 0.97],
+              delay: 0.6,
+            }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <img
+              src={getImageUrl(trendingPlace4.main_image)}
+              alt={trendingPlace4.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+              <h3 className="text-xl font-bold mb-2">{trendingPlace4.title}</h3>
+              {trendingPlace4.package_title && (
+                <p className="text-blue-300 mb-2">{trendingPlace4.package_title}</p>
+              )}
+            </div>
+            <button
+              onClick={() => navigate(`/PlaceView/${trendingPlace4.id}`, { state: { place: trendingPlace4 } })}
+              className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              Book Now
+            </button>
+          </motion.div>
+        )}
+        {/* Second row smaller */}
+        {trendingPlace5?.main_image && (
+          <motion.div
+            className="lg:col-span-2 md:col-span-2 col-span-1 relative rounded-lg overflow-hidden h-[400px]"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+            transition={{
+              duration: 0.8,
+              ease: [0.16, 0.77, 0.47, 0.97],
+              delay: 0.75,
+            }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <img
+              src={getImageUrl(trendingPlace5.main_image)}
+              alt={trendingPlace5.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+              <h3 className="text-xl font-bold mb-2">{trendingPlace5.title}</h3>
+              {trendingPlace5.package_title && (
+                <p className="text-blue-300 mb-2">{trendingPlace5.package_title}</p>
+              )}
+            </div>
+            <button
+              onClick={() => navigate(`/PlaceView/${trendingPlace5.id}`, { state: { place: trendingPlace5 } })}
+              className="absolute bottom-4 right-4 bg-blue-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              Book Now
+            </button>
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
+  ) : (
+    <div className="text-center py-16">
+      <h2 className="text-2xl font-semibold text-gray-600">No Trending Places Available</h2>
+      <p className="text-gray-500 mt-2">Check back later for exciting destinations!</p>
+    </div>
+  )
+}
             {/* Leisure Travel Section */}
-            <SectionHeader title="Leisure Travel" />
+            <SectionHeader title="Five Day Package" />
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
             >
-              {leisurePlaces.map((place) => (
+              {five_day.map((place) => (
                 <PlaceCard
                   key={place.id}
                   place={place}
@@ -426,7 +447,7 @@ export default function TravelService() {
               ))}
             </motion.div>
             {/* Adventure Travel Section */}
-            <SectionHeader title="Adventure Travel" />
+            <SectionHeader title="Ten Day Package" />
 
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -435,7 +456,7 @@ export default function TravelService() {
               transition={{ duration: 0.8 }}
             >
               
-              {adventurePlaces.map((place) => (
+              {ten_day.map((place) => (
                 <PlaceCard
                   key={place.id}
                   place={place}
@@ -444,15 +465,54 @@ export default function TravelService() {
                 />
               ))}
             </motion.div>
+
+
+
+
             {/* Hiking & Trekking Section */}
-            <SectionHeader title="Hiking & Trekking" />
+            <SectionHeader title="Fifteen Day Package" />
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
             >
-              {hikingPlaces.map((place) => (
+              {fifteen_day.map((place) => (
+                <PlaceCard
+                  key={place.id}
+                  place={place}
+                  onClick={(place) => navigate(`/PlaceView/${place.id}`, { state: { place } })}
+                  buttonText="Buy Now"
+                />
+              ))}
+            </motion.div>
+
+            <SectionHeader title="Twenty Day Package" />
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+            >
+              {twenty_day.map((place) => (
+                <PlaceCard
+                  key={place.id}
+                  place={place}
+                  onClick={(place) => navigate(`/PlaceView/${place.id}`, { state: { place } })}
+                  buttonText="Buy Now"
+                />
+              ))}
+            </motion.div>
+
+
+            <SectionHeader title="Twenty Five Package" />
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+            >
+              {twentyfive_day.map((place) => (
                 <PlaceCard
                   key={place.id}
                   place={place}

@@ -5,9 +5,12 @@ import os
 class Place(models.Model):
     place_type = [
         ('trending', 'Trending Places'),
-        ('adventure', 'Adventure Places'),
-        ('Hiking', 'Hiking & Trekking Places'),
-        ('Leisure', 'Leisure Travel Places'),
+        ('five_day', '5 Days Package'),
+        ('ten_day', '10 Days Package'),
+        ('fifteen_day', '15 Days Package'),
+        ('twenty_day', '20 Days Package'),
+        ('twentyfive_day', '25 Days Package'),
+
     ]
     
     title = models.CharField(max_length=50)
@@ -132,6 +135,15 @@ class Post(models.Model):
     def __str__(self) -> str:
         return self.post_title
     
+class Contact(models.Model):
+    contact_number = models.CharField(max_length=20)
+    instagram_link = models.URLField(max_length=200)
+    facebook_link = models.URLField(max_length=200)
+    whatsapp_link = models.URLField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return self.contact_number
 
 
 

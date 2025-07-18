@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { DateRangePicker } from "rsuite";
 import { ChevronDown, Minus, Plus, Users } from "lucide-react";
 import {BackendUrl} from "../../BackendUrl";
@@ -163,6 +163,7 @@ const HotelBookingForm = ({
 const Form = () => {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const selectedPlace = location.state?.place;
   
   const [countryCode, setCountryCode] = useState("+94");
@@ -285,6 +286,10 @@ const Form = () => {
       setPhoneNumber("");
       setAdults(0);
       setChildrenAges([]);
+      // Redirect to home after a short delay
+      setTimeout(() => {
+        navigate("/Service");
+      }, 1200);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -364,8 +369,8 @@ const Form = () => {
           </div>
         )}
         {success && (
-          <div className="mb-4 p-4 text-green-700 bg-green-100 rounded-lg text-sm">
-            Booking created successfully!
+          <div className="mb-4 p-4 text-green-800 bg-green-200 rounded-lg text-lg font-semibold flex items-center justify-center">
+            <span role="img" aria-label="check">✅</span>&nbsp;Thank you for your booking!
           </div>
         )}
         <form onSubmit={handleSubmit} className="bg-gray-700 p-0 sm:p-6 rounded-lg">

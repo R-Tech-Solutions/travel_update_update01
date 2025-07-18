@@ -130,6 +130,10 @@ const Gellery = () => {
 		);
 	};
 
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, []);
+
 	return (
 		<section className="relative w-full min-h-screen bg-gradient-to-br from-black via-black to-blue-900 overflow-hidden">
 			{/* Blue blurred circle background effect */}

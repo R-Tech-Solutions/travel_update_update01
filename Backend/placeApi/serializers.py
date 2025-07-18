@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Place, PlaceImage, ItineraryDay, ItineraryPhoto, Booking, Item, Service, GalleryPhoto, Post
+from .models import Place, PlaceImage, ItineraryDay, ItineraryPhoto, Booking, Item, Service, GalleryPhoto, Post, Contact
 
 class PlaceImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,4 +51,9 @@ class GalleryPhotoSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
+        fields = '__all__'
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
         fields = '__all__'

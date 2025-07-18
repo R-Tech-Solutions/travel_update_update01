@@ -300,7 +300,7 @@ function AddModal({
             />
           </div>
           <div>
-            <Label htmlFor="subtitle">City</Label>
+            <Label htmlFor="subtitle">Small History of the Place</Label>
             <Input
               id="subtitle"
               name="subtitle"
@@ -318,12 +318,12 @@ function AddModal({
               }
             >
               <SelectItem value="">Select Category</SelectItem>
-              <SelectItem value="trending">Trending Places</SelectItem>
-              <SelectItem value="adventure">Adventure Places</SelectItem>
-              <SelectItem value="honeymoon">Honeymoon Places</SelectItem>
-              <SelectItem value="beach">Beach Places</SelectItem>
-              <SelectItem value="Hiking">Hiking & Trekking Places</SelectItem>
-              <SelectItem value="Leisure">Leisure Travel Places</SelectItem>
+              <SelectItem value="trending">Trending Package</SelectItem>
+              <SelectItem value="five_day">5 Days Package</SelectItem>
+              <SelectItem value="ten_day">10 Days Package</SelectItem>
+              <SelectItem value="fifteen_day">15 Days Package</SelectItem>
+              <SelectItem value="twenty_day">20 Days Package</SelectItem>
+              <SelectItem value="twentyfive_day">25 Days Package</SelectItem>
             </Select>
           </div>
           <div>
@@ -1687,7 +1687,7 @@ function AddPlace() {
           <thead className="bg-gray-100">
             <tr>
               <th className="px-4 py-2 text-left">Company</th>
-              <th className="px-4 py-2 text-left">City</th>
+              {/* <th className="px-4 py-2 text-left">City</th> */}
               <th className="px-4 py-2 text-left">Type</th>
               <th className="px-4 py-2 text-left">Price</th>
               <th className="px-4 py-2 text-center">Actions</th>
@@ -1697,7 +1697,7 @@ function AddPlace() {
             {filteredPlaces.map((place) => (
               <tr key={place.id} className="border-b hover:bg-gray-50">
                 <td className="px-4 py-2">{place.title}</td>
-                <td className="px-4 py-2">{place.subtitle}</td>
+                {/* <td className="px-4 py-2">{place.subtitle}</td> */}
                 <td className="px-4 py-2">{place.place_type}</td>
                 <td className="px-4 py-2">{place.price}</td>
                 <td className="px-4 py-2 flex justify-center space-x-2">

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import logo from '/travel-logo.png'; // ❌ Don't do this for public images
 
 // Icons
 import { LuBox, LuUser, LuMessageSquare, LuCalendar } from "react-icons/lu";
@@ -20,13 +21,14 @@ const Sidebar = () => {
     { id: 4, path: "/userAccess", name: "UserAccess", icon: LuUser },
     { id: 5, path: "/gellery", name: "Gellery", icon: LuBox },
     { id: 6, path: "/Posts", name: "Posts", icon: LuCalendar },
+    { id: 7, path: "/Settings", name: "Setting", icon: LuCalendar },
   ];
   return (
-    <div className="w-16 md:w-56 fixed left-0 top-0 z-10 h-screen border-r pt-8 px-4 bg-white ">
+    <div className="w-16 md:w-56 fixed left-0 top-0 z-10 h-screen border-r pt-8 px-4 bg-white overflow-y-auto">
       {/* Logo */}
 
       <div className="mb-8">
-        <img src="/vite.svg" alt="logo" className="w-28 hidden md:flex" />
+        <img src="/travel-logo.png" alt="logo" className="w-28 hidden md:flex" />
         <img src="/vite.svg" alt="logo" className="w-8 flex md:hidden" />
       </div>
 
@@ -56,8 +58,8 @@ const Sidebar = () => {
 
       <div className="w-full absolute bottom-5 left-0 px-4 py-2 cursor-pointer text-center">
         <p className="flex items-center space-x2 text-x-s text-white py-2 px-5 bg-gradient-to-r from-idigo-500 to-violet-600 rounded-full">
-          <span>?</span>
-          <span className="hidden md:flex">Need Help?</span>
+          {/* <span>?</span> */}
+          {/* <span className="hidden md:flex">Need Help?</span> */}
         </p>
       </div>
     </div>

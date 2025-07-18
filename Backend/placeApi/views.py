@@ -2,13 +2,14 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Place, PlaceImage, ItineraryDay, ItineraryPhoto, Booking, Item, Service, GalleryPhoto, Post
-from .serializers import PlaceSerializer, BookingSerializer, ItemSerializer, ServiceSerializer, GalleryPhotoSerializer, PostSerializer
+from .models import Place, PlaceImage, ItineraryDay, ItineraryPhoto, Booking, Item, Service, GalleryPhoto, Post,Contact
+from .serializers import PlaceSerializer, BookingSerializer, ItemSerializer, ServiceSerializer, GalleryPhotoSerializer, PostSerializer,ContactSerializer
 import os
 import json
 from django.core.mail import send_mail
 from django.conf import settings
 import logging
+
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -233,7 +234,6 @@ def update_booking(request, pk):
         serializer = BookingSerializer(booking, data=data, partial=True)
         if serializer.is_valid():
             # Check if status is being updated to approved
-            if request.data.get('status') == 'approved' and booking.status != 'approved':
                 subject = 'Your Booking Has Been Approved!'
                 message = f"""
                 Dear {booking.user_name},
@@ -271,8 +271,8 @@ def update_booking(request, pk):
                         'message': 'Booking approved but email sending failed',
                         'error': str(e)
                     }, status=status.HTTP_200_OK)
-            serializer.save()
-            return Response(serializer.data)
+                serializer.save()
+                return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Booking.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -491,3 +491,63 @@ def delete_post(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@api_view(['GET'])
+def list_contacts(request):
+    contacts = Contact.objects.all()
+    serializer = ContactSerializer(contacts, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def create_contact(request):
+    serializer = ContactSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_contact(request, pk):
+    try:
+        contact = Contact.objects.get(pk=pk)
+    except Contact.DoesNotExist:
+        return Response({'error':'Contact not found'},status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = ContactSerializer(contact)
+    return Response(serializer.data)
+
+@api_view(['PUT', 'POST'])
+def update_contact(request,pk):
+    try:
+        contact = Contact.objects.get(pk=pk)
+    except Contact.DoesNotExist:
+        return Response({'error':'Contact not found'},status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = ContactSerializer(contact,data=request.data, partial=(request.method == 'PATCH '))
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+def delete_contact(request,pk):
+    try:
+        contact = Contact.objects.get(pk=pk)
+    except Contact.DoesNotExist:
+        return Response({'error':'Contact not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    contact.delete()
+    return Response({'message':'Contact delete successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+def get_latest_social_links(request):
+    contact = Contact.objects.last()
+    if contact:
+        return Response({
+            'facebook_link': contact.facebook_link,
+            'whatsapp_link': contact.whatsapp_link,
+            'instagram_link': contact.instagram_link,
+        })
+    return Response({'error': 'No contact found'}, status=404)

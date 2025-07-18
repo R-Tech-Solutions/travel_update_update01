@@ -6,7 +6,7 @@ const Header = () => {
     <div className="flex justify-between items-center p-4">
       <div>
         <h1 className="text-x5">Welcome Back</h1>
-        <p className="text-xl font-semibold">Alexia</p>
+        <p className="text-xl font-semibold">Admin</p>
       </div>
 
       <div className="flex items-center space-x-5">

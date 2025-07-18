@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { NavLink, Link } from "react-router-dom";
 import ResponsiveMenu from "./ResponsiveMenu";
 import { HiMenuAlt3, HiMenuAlt1 } from "react-icons/hi";
-import FooterLogo from "../../assets/plc/Log.png";
+import FooterLogo from "../../assets/plc/travel-logo.png";
 
 export const NavbarLinks = [
 	{
@@ -66,9 +66,9 @@ const Navbar = ({ handleOrderPopup, showMenu, setShowMenu }) => {
 	return (
 		<>
 			<nav
-				className={`fixed top-0 left-0 w-full h-[70px] z-50 bg-black/40 backdrop-blur-sm text-white transition-all duration-300 ${
+				className={`fixed top-0 left-0 w-full h-[85px] z-50 bg-black/40 backdrop-blur-sm text-white transition-all duration-300 ${
 					scrolled ? "shadow-lg shadow-black/50" : ""
-				}`}
+				}text-xl font-bold`}
 			>
 				<div className="container py-4 sm:py-2">
 					<div className="flex justify-between items-center">

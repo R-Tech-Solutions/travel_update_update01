@@ -119,7 +119,7 @@ const UserAccess = () => {
         });
       } else {
         // Create new item
-        response = await fetch(`{BackendUrl}/api/items/create/`, {
+        response = await fetch(`${BackendUrl}/api/items/create/`, {
           method: 'POST',
           body: formData,
         });

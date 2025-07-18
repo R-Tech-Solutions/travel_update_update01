@@ -7,7 +7,7 @@ import OurService from "../components/OurService/OurService";
 import Banner from "../components/Banner/Banner";
 import BannerPic from "../components/BannerPic/BannerPic";
 import BannerImg from "../assets/nature.jpg";
-import SplashCursor from "../components/SplashCursor/SplashCursor";
+// import SplashCursor from "../components/SplashCursor/SplashCursor";
 // import OrderPopup from "../components/OrderPopup/OrderPopup";
 
 // Import all video files
@@ -37,7 +37,7 @@ const Home = ({ showMenu, setShowMenu }) => {
 
   return (
     <div className={`relative min-h-screen bg-gradient-to-b from-black via-black to-blue-900 ${showMenu ? 'overflow-hidden' : 'overflow-x-hidden'}`}>
-      <SplashCursor />
+      {/* <SplashCursor /> */}
       {/* Blue blurred circle background effect centered, smaller and only in the center */}
       <div className="z-0 absolute opacity-80 rounded-full blur-[120px] w-[300px] h-[300px] bg-blue-500 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
       {/* Hero Section with Video Slider */}
