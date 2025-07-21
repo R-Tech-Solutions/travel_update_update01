@@ -320,10 +320,11 @@ function AddModal({
               <SelectItem value="">Select Category</SelectItem>
               <SelectItem value="trending">Trending Package</SelectItem>
               <SelectItem value="five_day">5 Days Package</SelectItem>
-              <SelectItem value="ten_day">10 Days Package</SelectItem>
-              <SelectItem value="fifteen_day">15 Days Package</SelectItem>
-              <SelectItem value="twenty_day">20 Days Package</SelectItem>
-              <SelectItem value="twentyfive_day">25 Days Package</SelectItem>
+              <SelectItem value="seven_days">7 Days Package</SelectItem>
+              <SelectItem value="eight_days">8 Days Package</SelectItem>
+              <SelectItem value="ten_days">10 Days Package</SelectItem>
+              <SelectItem value="fourteen_days">14 Days Pakage</SelectItem>
+              <SelectItem value="eighteen_dyas">18 Days Pakage</SelectItem>
             </Select>
           </div>
           <div>
@@ -543,12 +544,12 @@ function EditModal({
             >
               <SelectItem value="">Select Category</SelectItem>
               <SelectItem value="trending">Trending Places</SelectItem>
-              <SelectItem value="adventure">Adventure Places</SelectItem>
-              <SelectItem value="honeymoon">Honeymoon Places</SelectItem>
-              <SelectItem value="beach">Beach Places</SelectItem>
-              <SelectItem value="historical">Historical Places</SelectItem>
-              <SelectItem value="Hiking">Hiking & Trekking Places</SelectItem>
-              <SelectItem value="Leisure">Leisure Travel Places</SelectItem>
+              <SelectItem value="five_day">5 Days Package</SelectItem>
+              <SelectItem value="seven_days">7 Days Package</SelectItem>
+              <SelectItem value="eight_days">8 Days Package</SelectItem>
+              <SelectItem value="ten_days">10 Days Package</SelectItem>
+              <SelectItem value="fourteen_days">14 Days Pakage</SelectItem>
+              <SelectItem value="eighteen_dyas">18 Days Pakage</SelectItem>
             </Select>
           </div>
           <div>

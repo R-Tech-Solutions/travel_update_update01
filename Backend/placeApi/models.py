@@ -6,10 +6,11 @@ class Place(models.Model):
     place_type = [
         ('trending', 'Trending Places'),
         ('five_day', '5 Days Package'),
-        ('ten_day', '10 Days Package'),
-        ('fifteen_day', '15 Days Package'),
-        ('twenty_day', '20 Days Package'),
-        ('twentyfive_day', '25 Days Package'),
+        ('seven_days', '7 Days Package'),
+        ('eight_days', '8 Days Package'),
+        ('ten_days', '10 Days Package'),
+        ('fourteen_days', '14 Days Pakage'),
+        ('eighteen_dyas', '18 Days Pakage'),
 
     ]
     

@@ -211,10 +211,11 @@ export default function TravelService() {
 
   const trendingPlaces = places.filter((p) => p.place_type === "trending");
   const five_day = places.filter((p) => p.place_type === "five_day");
-  const ten_day = places.filter((p) => p.place_type === "ten_day");
-  const fifteen_day = places.filter((p) => p.place_type === "fifteen_day");
-  const twenty_day = places.filter((p) => p.place_type === "twenty_day");
-  const twentyfive_day = places.filter((p) => p.place_type === "twentyfive_day");
+  const seven_days = places.filter((p) => p.place_type === "seven_days");
+  const eight_days = places.filter((p) => p.place_type === "eight_days");
+  const ten_days = places.filter((p) => p.place_type === "ten_days");
+  const fourteen_days = places.filter((p) => p.place_type === "fourteen_days");
+  const eighteen_dyas = places.filter((p) => p.place_type === "eighteen_dyas");
   // Remove the getTrendingPlace function and use array indices directly
   const trendingPlace1 = trendingPlaces[0] || {};
   const trendingPlace2 = trendingPlaces[1] || {};
@@ -447,7 +448,7 @@ export default function TravelService() {
               ))}
             </motion.div>
             {/* Adventure Travel Section */}
-            <SectionHeader title="Ten Day Package" />
+            <SectionHeader title="Seven Days Package" />
 
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -456,7 +457,7 @@ export default function TravelService() {
               transition={{ duration: 0.8 }}
             >
               
-              {ten_day.map((place) => (
+              {seven_days.map((place) => (
                 <PlaceCard
                   key={place.id}
                   place={place}
@@ -470,14 +471,14 @@ export default function TravelService() {
 
 
             {/* Hiking & Trekking Section */}
-            <SectionHeader title="Fifteen Day Package" />
+            <SectionHeader title="Eight Days Package" />
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
             >
-              {fifteen_day.map((place) => (
+              {eight_days.map((place) => (
                 <PlaceCard
                   key={place.id}
                   place={place}
@@ -487,14 +488,14 @@ export default function TravelService() {
               ))}
             </motion.div>
 
-            <SectionHeader title="Twenty Day Package" />
+            <SectionHeader title="Ten Days Package" />
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
             >
-              {twenty_day.map((place) => (
+              {ten_days.map((place) => (
                 <PlaceCard
                   key={place.id}
                   place={place}
@@ -505,14 +506,14 @@ export default function TravelService() {
             </motion.div>
 
 
-            <SectionHeader title="Twenty Five Package" />
+            <SectionHeader title="Fourteen Days Package" />
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
             >
-              {twentyfive_day.map((place) => (
+              {fourteen_days.map((place) => (
                 <PlaceCard
                   key={place.id}
                   place={place}
@@ -521,7 +522,23 @@ export default function TravelService() {
                 />
               ))}
             </motion.div>
-            
+
+            <SectionHeader title="eighteen Days Package" />
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+            >
+              {eighteen_dyas.map((place) => (
+                <PlaceCard
+                  key={place.id}
+                  place={place}
+                  onClick={(place) => navigate(`/PlaceView/${place.id}`, { state: { place } })}
+                  buttonText="Buy Now"
+                />
+              ))}
+            </motion.div>            
 
             
           </div>
