@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import FooterLogoImg from "../../assets/plc/img3.jpg";
+import { BackendUrl } from "../../BackendUrl";
+
+
 
 const Footer = () => {
   const [contactNumber, setContactNumber] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/contact/")
+    fetch(`${BackendUrl}/api/contact/`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {

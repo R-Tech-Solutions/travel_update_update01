@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { BackendUrl } from "../BackendUrl";
+
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -15,7 +17,7 @@ const ContactForm = () => {
   // Fetch the latest contact on mount
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/contact/")
+      .get(`${BackendUrl}/api/contact/`)
       .then((res) => {
         if (Array.isArray(res.data) && res.data.length > 0) {
           const last = res.data[res.data.length - 1];
@@ -41,13 +43,13 @@ const ContactForm = () => {
     try {
       if (editId) {
         await axios.put(
-          `http://127.0.0.1:8000/api/contacts/${editId}/update`,
+          `${BackendUrl}/api/contacts/${editId}/update`,
           formData
         );
         alert("Settings updated successfully");
       } else {
         const res = await axios.post(
-          "http://127.0.0.1:8000/api/contacts/create",
+          `${BackendUrl}/api/contacts/create`,
           formData
         );
         alert("Settings created successfully");

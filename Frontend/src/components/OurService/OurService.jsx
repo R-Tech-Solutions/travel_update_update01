@@ -76,7 +76,7 @@ export default function ContactSection({ onOrderClick }) {
 
   // Fetch social links from the backend
   useEffect(() => {
-    axios.get("http://localhost:8000/api/social-links/")
+    axios.get(`${BackendUrl}/api/social-links/`)
       .then((res) => setLinks(res.data))
       .catch((err) => console.error("Failed to fetch links", err));
   }, []);
