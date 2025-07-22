@@ -495,16 +495,26 @@ def delete_post(request, pk):
 
 @api_view(['GET'])
 def list_contacts(request):
-    contacts = Contact.objects.all()
-    serializer = ContactSerializer(contacts, many=True)
+    # Fetch the most recent contact entry
+    contact = Contact.objects.last()
+    if not contact:
+        # Return a 404 if no contact info has been saved yet
+        return Response({'error': 'No contact information found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Serialize the single contact object
+    serializer = ContactSerializer(contact)
     return Response(serializer.data)
 
 @api_view(['POST'])
 def create_contact(request):
-    serializer = ContactSerializer(data=request.data)
+    # Find the first contact object, or create a new one if it doesn't exist
+    contact, created = Contact.objects.get_or_create(pk=1)
+    
+    # Update the contact object with the new data
+    serializer = ContactSerializer(contact, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])

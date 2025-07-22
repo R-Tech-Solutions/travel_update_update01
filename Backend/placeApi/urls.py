@@ -55,9 +55,9 @@ urlpatterns = [
     # CONTACTS INFORMATION
 
     path('contact/', list_contacts, name='list_contacts'),
-    path('contacts/create', create_contact, name='create_contact'),
-    path('contacts/<int:pk>', get_contact,name='get_contact'),
-    path('contacts/<int:pk>/update', update_contact,name='update_contact'),
-    path('contacts/<int:pk>/delete', delete_contact, name='delete_contact'),
+    path('contacts/create/', create_contact, name='create_contact'),
+    path('contacts/<int:pk>/', get_contact,name='get_contact'),
+    path('contacts/<int:pk>/update/', update_contact,name='update_contact'),
+    path('contacts/<int:pk>/delete/', delete_contact, name='delete_contact'),
     path('social-links/', get_latest_social_links, name='get_latest_social_links'),
 ]
