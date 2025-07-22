@@ -24,13 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+SECRET_KEY = 'django-insecure-)*m7l1t+ix&law8e5#f-e!iv%jcc+-+do6!n4l*7bo=ps9z72+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ 
 DEBUG = True
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com', 'admin.citytourslanka.com').split(',')
-
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com,127.0.0.1,localhost').split(',')
 
 # Application definition
 
@@ -150,8 +150,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    "https://admin.citytourslanka.com",
-    "https://citytourslanka.com",
+    # "https://admin.citytourslanka.com",
+    # "https://citytourslanka.com",
+
+        "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
