@@ -9,6 +9,9 @@ import json
 from django.core.mail import send_mail
 from django.conf import settings
 import logging
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 
 # Set up logging
@@ -553,11 +556,17 @@ def delete_contact(request,pk):
 
 @api_view(['GET'])
 def get_latest_social_links(request):
-    contact = Contact.objects.last()
-    if contact:
+    latest = Contact.objects.order_by('-id').first()
+    if latest:
         return Response({
-            'facebook_link': contact.facebook_link,
-            'whatsapp_link': contact.whatsapp_link,
-            'instagram_link': contact.instagram_link,
+            "facebook_link": latest.facebook_link,
+            "whatsapp_link": latest.whatsapp_link,
+            "instagram_link": latest.instagram_link,
         })
-    return Response({'error': 'No contact found'}, status=404)
+    else:
+        return Response({
+            "facebook_link": "",
+            "whatsapp_link": "",
+            "instagram_link": "",
+        })
+

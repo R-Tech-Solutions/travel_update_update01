@@ -2,11 +2,7 @@
 import { BackendUrl } from "../../BackendUrl";
 
 import { useState, useEffect } from "react";
-import {
-  Facebook,
-  Instagram,
-  
-} from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { Calendar, Headphones, Heart, HeartPulse, Wallet } from "lucide-react";
 import PropTypes from "prop-types";
@@ -54,6 +50,8 @@ export default function ContactSection({ onOrderClick }) {
     whatsapp_link: "#",
     instagram_link: "#",
   });
+  const [linksLoading, setLinksLoading] = useState(true);
+  const [linksError, setLinksError] = useState(null);
 
   // Fetch services from the backend
   useEffect(() => {
@@ -76,12 +74,22 @@ export default function ContactSection({ onOrderClick }) {
 
   // Fetch social links from the backend
   useEffect(() => {
-    axios.get(`${BackendUrl}/api/social-links/`)
-      .then((res) => setLinks(res.data))
-      .catch((err) => console.error("Failed to fetch links", err));
+    setLinksLoading(true);
+    setLinksError(null);
+    axios
+      .get(`${BackendUrl}/api/social-links/`)
+      .then((res) => {
+        setLinks(res.data);
+        setLinksLoading(false);
+      })
+      .catch((err) => {
+        setLinksError("Failed to fetch social links");
+        setLinksLoading(false);
+        console.error("Failed to fetch links", err);
+      });
   }, []);
 
-  // Fallback for missing services to always show 5 cards
+  // Fallback for missing services to always show5 cards
   const fallbackServices = [
     {
       service_title: "Personalized Vacation Planning",
@@ -112,6 +120,8 @@ export default function ContactSection({ onOrderClick }) {
 
   // Merge backend services with fallback to always have 5
   const mergedServices = [...services, ...fallbackServices].slice(0, 5);
+
+  console.log("Fetched links:", links);
 
   return (
     <section className="relative w-full min-h-screen bg-gradient-to-br from-black via-black to-blue-900 overflow-hidden">
@@ -187,32 +197,58 @@ export default function ContactSection({ onOrderClick }) {
         <h3 className="mb-4 text-base font-semibold sm:text-lg md:text-xl">
           Follow Us
         </h3>
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="social-icons"
-        >
-          <motion.div variants={item}>
-            <a href={links.facebook_link} target="_blank" rel="noopener noreferrer">
-              <SocialIcon icon={<Facebook className="h-6 w-6" />} type="facebook" />
-            </a>
-          </motion.div>
+        {linksLoading ? (
+          <p>Loading social links...</p>
+        ) : linksError ? (
+          <p className="text-red-500">{linksError}</p>
+        ) : (
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="social-icons"
+          >
+            <motion.div variants={item}>
+              <a
+                href={links.facebook_link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <SocialIcon
+                  icon={<Facebook className="h-6 w-6" />}
+                  type="facebook"
+                />
+              </a>
+            </motion.div>
 
-          <motion.div variants={item}>
-            <a href={links.whatsapp_link} target="_blank" rel="noopener noreferrer">
-              <SocialIcon icon={<FaWhatsapp className="h-6 w-6" />} type="whatsapp" />
-            </a>
-          </motion.div>
+            <motion.div variants={item}>
+              <a
+                href={links.whatsapp_link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <SocialIcon
+                  icon={<FaWhatsapp className="h-6 w-6" />}
+                  type="whatsapp"
+                />
+              </a>
+            </motion.div>
 
-          <motion.div variants={item}>
-            <a href={links.instagram_link} target="_blank" rel="noopener noreferrer">
-              <SocialIcon icon={<Instagram className="h-6 w-6" />} type="instagram" />
-            </a>
+            <motion.div variants={item}>
+              <a
+                href={links.instagram_link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <SocialIcon
+                  icon={<Instagram className="h-6 w-6" />}
+                  type="instagram"
+                />
+              </a>
+            </motion.div>
           </motion.div>
-
-        </motion.div>
+        )}
       </motion.div>
     </section>
   );

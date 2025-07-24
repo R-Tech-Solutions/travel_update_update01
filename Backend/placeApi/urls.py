@@ -9,6 +9,7 @@ from .views import (
     list_posts, create_post, get_post, update_post, delete_post , list_contacts, create_contact,get_contact,update_contact,delete_contact
 )
 
+
 urlpatterns = [
     path('places/', get_places, name='get_places'),
     path('places/create/', create_places, name='create_places'),
@@ -45,11 +46,12 @@ urlpatterns = [
     path('services/<int:pk>/delete/', delete_service, name='delete_service'),
 
     # Post URLs
-        path('posts/', list_posts, name='list_posts'),
-        path('posts/create/', create_post, name='create_post'),
-        path('posts/<int:pk>/', get_post, name='get_post'),
-        path('posts/<int:pk>/update/', update_post, name='update_post'),
-        path('posts/<int:pk>/delete/', delete_post, name='delete_post'),
+    path('posts/', list_posts, name='list_posts'),
+    path('posts/create/', create_post, name='create_post'),
+    path('posts/<int:pk>/', get_post, name='get_post'),
+    path('posts/<int:pk>/update/', update_post, name='update_post'),
+    path('posts/<int:pk>/delete/', delete_post, name='delete_post'),
+    path('posts/create/', create_post, name='create_post'),
 
 
     # CONTACTS INFORMATION
@@ -57,7 +59,8 @@ urlpatterns = [
     path('contact/', list_contacts, name='list_contacts'),
     path('contacts/create/', create_contact, name='create_contact'),
     path('contacts/<int:pk>/', get_contact,name='get_contact'),
-    path('contacts/<int:pk>/update/', update_contact,name='update_contact'),
+    path('contacts/<int:pk>/update/', update_contact, name='update_contact'),
     path('contacts/<int:pk>/delete/', delete_contact, name='delete_contact'),
     path('social-links/', get_latest_social_links, name='get_latest_social_links'),
+
 ]

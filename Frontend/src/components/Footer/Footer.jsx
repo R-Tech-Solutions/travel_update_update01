@@ -11,8 +11,8 @@ const Footer = () => {
     fetch(`${BackendUrl}/api/contact/`)
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setContactNumber(data[data.length - 1].contact_number);
+        if (data && data.contact_number) {
+          setContactNumber(data.contact_number);
         }
       })
       .catch((err) => {

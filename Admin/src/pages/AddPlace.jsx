@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Eye, Trash2, Edit, Plus, X } from "lucide-react";
 import axios from "axios";
-import { BackendUrl } from "../BackendUrl";
+import { BackendUrl } from "../Backendurl";
 
 // Reusable UI Components
 const Button = ({

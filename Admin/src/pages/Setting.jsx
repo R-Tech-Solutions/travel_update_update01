@@ -19,19 +19,21 @@ const ContactForm = () => {
     axios
       .get(`${BackendUrl}/api/contact/`)
       .then((res) => {
-        if (Array.isArray(res.data) && res.data.length > 0) {
-          const last = res.data[res.data.length - 1];
+        if (res.data && !Array.isArray(res.data)) {
           setFormData({
-            contact_number: last.contact_number || "",
-            instagram_link: last.instagram_link || "",
-            facebook_link: last.facebook_link || "",
-            whatsapp_link: last.whatsapp_link || "",
+            contact_number: res.data.contact_number || "",
+            instagram_link: res.data.instagram_link || "",
+            facebook_link: res.data.facebook_link || "",
+            whatsapp_link: res.data.whatsapp_link || "",
           });
-          setEditId(last.id);
+          setEditId(res.data.id);
         }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        setLoading(false);
+        console.error("Failed to fetch contact info", err);
+      });
   }, []);
 
   const handleChange = (e) => {
@@ -43,13 +45,13 @@ const ContactForm = () => {
     try {
       if (editId) {
         await axios.put(
-          `${BackendUrl}/api/contacts/${editId}/update`,
+          `${BackendUrl}/api/contacts/${editId}/update/`,
           formData
         );
         alert("Settings updated successfully");
       } else {
         const res = await axios.post(
-          `${BackendUrl}/api/contacts/create`,
+          `${BackendUrl}/api/contacts/create/`,
           formData
         );
         alert("Settings created successfully");
@@ -75,7 +77,6 @@ const ContactForm = () => {
       <input
         type="text"
         name="contact_number"
-        placeholder="Contact Number"
         value={formData.contact_number}
         onChange={handleChange}
         className="w-full p-2 border rounded"
