@@ -30,7 +30,8 @@ SECRET_KEY = 'django-insecure-)*m7l1t+ix&law8e5#f-e!iv%jcc+-+do6!n4l*7bo=ps9z72+
  
 DEBUG = True
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com').split(',')
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com,127.0.0.1,localhost').split(',')
+CITYTOURS_HOSTS = 'citytourslanka.com,admin.citytourslanka.com'
+ALLOWED_HOSTS = CITYTOURS_HOSTS.split(',')
 
 # Application definition
 
@@ -161,16 +162,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    # "https://admin.citytourslanka.com",
-    # "https://citytourslanka.com",
-
-    "http://localhost:5173",    # Frontend (Vite/React default)
-    "http://127.0.0.1:5173",    # Alternative frontend URL
-    "http://localhost:8000",    # Backend (if accessed via browser)
-    "http://127.0.0.1:8000",    # Alternative backend URL
-
+    "https://citytourslanka.com",
+    "https://admin.citytourslanka.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
