@@ -530,14 +530,14 @@ def get_contact(request, pk):
     serializer = ContactSerializer(contact)
     return Response(serializer.data)
 
-@api_view(['PUT', 'POST'])
+@api_view(['PUT', 'PATCH', 'POST'])
 def update_contact(request,pk):
     try:
         contact = Contact.objects.get(pk=pk)
     except Contact.DoesNotExist:
         return Response({'error':'Contact not found'},status=status.HTTP_404_NOT_FOUND)
     
-    serializer = ContactSerializer(contact,data=request.data, partial=(request.method == 'PATCH '))
+    serializer = ContactSerializer(contact,data=request.data, partial=(request.method == 'PATCH'))
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)

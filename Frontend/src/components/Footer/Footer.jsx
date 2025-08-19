@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import FooterLogoImg from "../../assets/plc/img3.jpg";
 import { BackendUrl } from "../../BackendUrl";
 
@@ -163,93 +164,30 @@ const Footer = () => {
                   </a>
                 </li>
               </ul>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <p className="font-medium">
-                  Services
-                </p>
-
-                <ul className="mt-6 space-y-4 text-sm text-gray-300">
+              {/* Quick Navigation Links */}
+              <div className="mt-8">
+                <p className="font-medium">Quick Links</p>
+                <ul className="mt-4 space-y-3 text-sm text-gray-300">
                   <li>
-                    <a
-                      href="<Service />"
-                      className="transition hover:opacity-75"
-                    >
+                    <Link to="/" className="transition hover:opacity-75">
+                      Home
+                    </Link>
+                  </li>
+          
+                  <li>
+                    <Link to="/Service" className="transition hover:opacity-75">
                       Service
-                    </a>
+                    </Link>
                   </li>
-
                   <li>
-                    <a
-                      href="#"
-                      className="transition hover:opacity-75"
-                    >
-                      Company Review
-                    </a>
+                    <Link to="/Blog" className="transition hover:opacity-75">
+                      Blog
+                    </Link>
                   </li>
-
                   <li>
-                    <a
-                      href="#"
-                      className="transition hover:opacity-75"
-                    >
-                      Accounts Review
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      href="#"
-                      className="transition hover:opacity-75"
-                    >
-                      HR Consulting
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      href="#"
-                      className="transition hover:opacity-75"
-                    >
-                      SEO Optimisation
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <p className="font-medium">
-                  Company
-                </p>
-
-                <ul className="mt-6 space-y-4 text-sm text-gray-300">
-                  <li>
-                    <a
-                      href="#"
-                      className="transition hover:opacity-75"
-                    >
-                      About
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      href="#"
-                      className="transition hover:opacity-75"
-                    >
-                      Meet the Team
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      href="#"
-                      className="transition hover:opacity-75"
-                    >
-                      Accounts Review
-                    </a>
+                    <Link to="/Gellery" className="transition hover:opacity-75">
+                      Gallery
+                    </Link>
                   </li>
                 </ul>
               </div>

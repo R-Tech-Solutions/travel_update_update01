@@ -1008,6 +1008,20 @@ function AddPlace() {
       formData.append("about_place", selectedPlace.about_place);
       formData.append("place_type", selectedPlace.place_type);
       formData.append("price_title", selectedPlace.price_title);
+      // Newly added fields to persist Highlights/Include/Exclude and package title
+      formData.append(
+        "tour_highlights",
+        JSON.stringify(selectedPlace.highlights || [])
+      );
+      formData.append(
+        "include",
+        JSON.stringify(selectedPlace.includeText || [])
+      );
+      formData.append(
+        "exclude",
+        JSON.stringify(selectedPlace.excludeText || [])
+      );
+      formData.append("package_title", selectedPlace.package_title || "");
 
       // Handle main image
       if (selectedPlace.main_image && selectedPlace.main_image.file) {

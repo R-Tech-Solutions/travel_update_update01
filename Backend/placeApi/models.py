@@ -14,17 +14,17 @@ class Place(models.Model):
 
     ]
     
-    title = models.CharField(max_length=50)
-    subtitle = models.CharField(max_length=200)
+    title = models.CharField(blank=True, default='')
+    subtitle = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     about_place = models.TextField()
-    tour_highlights = models.CharField(max_length=200)
-    include = models.CharField(max_length=200)
-    exclude = models.CharField(max_length=200)
-    price_title = models.CharField(max_length=100, null=False, blank=True, default="")
+    tour_highlights = models.TextField(blank=True, default='')
+    include = models.TextField(blank=True, default='')
+    exclude = models.TextField(blank=True, default='')
+    price_title = models.CharField(blank=True, default='')
     main_image = models.ImageField(upload_to='places/main_images/', null=True, blank=True, max_length=255)
     place_type = models.CharField(max_length=50, choices=place_type, default='trending')
-    package_title = models.CharField(max_length=200, null=False, blank=True, default="")
+    package_title = models.CharField(blank=True, default='')
 
     def __str__(self):
         return self.title
