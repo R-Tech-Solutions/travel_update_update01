@@ -5,6 +5,9 @@ import { NavLink, Link } from "react-router-dom";
 import ResponsiveMenu from "./ResponsiveMenu";
 import { HiMenuAlt3, HiMenuAlt1 } from "react-icons/hi";
 import FooterLogo from "../../assets/plc/travel-logo.png";
+import { BackendUrl } from "../../BackendUrl";
+import axios from "axios";
+import PropTypes from 'prop-types';
 
 export const NavbarLinks = [
 	{
@@ -40,8 +43,36 @@ const DropdownLinks = [
 	},
 ];
 
-const Navbar = ({ handleOrderPopup, showMenu, setShowMenu }) => {
+const Navbar = ({ showMenu, setShowMenu }) => {
 	const [scrolled, setScrolled] = useState(false);
+	const [logoImage, setLogoImage] = useState(null);
+	const [logoLoading, setLogoLoading] = useState(true);
+
+	// Fetch logo from API
+	useEffect(() => {
+		const fetchLogo = async () => {
+			try {
+				setLogoLoading(true);
+				// Fetch only company_logo from dedicated endpoint
+				const response = await axios.get(`${BackendUrl}/api/front/`);
+				const items = Array.isArray(response.data) ? response.data : [];
+				const first = items[0];
+				const logoPath = first?.company_logo;
+				if (logoPath) {
+					const isAbsolute = /^https?:\/\//i.test(logoPath);
+					setLogoImage(isAbsolute ? logoPath : `${BackendUrl}${logoPath}`);
+				} else {
+					setLogoImage(null);
+				}
+			} catch (error) {
+				console.error('Error fetching logo:', error);
+			} finally {
+				setLogoLoading(false);
+			}
+		};
+
+		fetchLogo();
+	}, []);
 
 	// Track scroll position to add shadow
 	useEffect(() => {
@@ -73,12 +104,28 @@ const Navbar = ({ handleOrderPopup, showMenu, setShowMenu }) => {
 				<div className="container py-4 sm:py-2">
 					<div className="flex justify-between items-center">
 						<div className="flex items-center gap-4 font-bold text-2xl px-2">
-							<Link to={"/"} onClick={() => window.scrollTo(0, 0)}>
-								<img
-									src={FooterLogo}
-									alt="Company Logo"
-									className="h-[80px] w-auto" // Add appropriate sizing classes
-								/>
+						<Link to={"/"} onClick={() => window.scrollTo(0, 0)}>
+								{logoLoading ? (
+									<div className="h-[80px] w-[60px] flex items-center justify-center">
+										<div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
+									</div>
+								) : logoImage ? (
+									<img
+										src={logoImage}
+										alt="Company Logo"
+										className="h-[60px] w-auto"
+										onError={(e) => {
+											console.error('Error loading logo image:', e);
+											e.target.src = FooterLogo;
+										}}
+									/>
+								) : (
+									<img
+										src={FooterLogo}
+										alt="Company Logo"
+										className="h-[80px] w-auto"
+									/>
+								)}
 							</Link>
 						</div>
 						<div className="hidden md:block flex-1">

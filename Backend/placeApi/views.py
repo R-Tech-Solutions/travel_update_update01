@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Place, PlaceImage, ItineraryDay, ItineraryPhoto, Booking, Item, Service, GalleryPhoto, Post,Contact
-from .serializers import PlaceSerializer, BookingSerializer, ItemSerializer, ServiceSerializer, GalleryPhotoSerializer, PostSerializer,ContactSerializer
+from .models import Place, PlaceImage, ItineraryDay, ItineraryPhoto, Booking, Item, Service, GalleryPhoto, Post,Contact, Front
+from .serializers import PlaceSerializer, BookingSerializer, ItemSerializer, ServiceSerializer, GalleryPhotoSerializer, PostSerializer,ContactSerializer, FrontSerializer
 import os
 import json
 from django.core.mail import send_mail
@@ -569,4 +569,91 @@ def get_latest_social_links(request):
             "whatsapp_link": "",
             "instagram_link": "",
         })
+
+
+
+# Front CRUD views
+
+@api_view(['GET'])
+def list_front(request):
+    front = Front.objects.all()
+    serializer = FrontSerializer(front, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def create_front(request):
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"Request data: {request.data}")
+    logger.info(f"Request FILES: {request.FILES}")
+    logger.info(f"Request FILES keys: {list(request.FILES.keys()) if request.FILES else 'No files'}")
+
+    serializer = FrontSerializer(data=request.data)
+    if serializer.is_valid():
+        logger.info("Create Front - Serializer is valid")
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    logger.error(f"Serializer errors: {serializer.errors}")
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_front(request,pk):
+    try:
+        front = Front.objects.get(pk=pk)
+        serializer = FrontSerializer(front)
+        return Response(serializer.data)
+    except Front.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT', 'POST'])
+def update_front(request,pk):
+    try:
+        front = Front.objects.get(pk=pk)
+    except Front.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    logger.info(f"Update Front - Request method: {request.method}")
+    logger.info(f"Request data: {request.data}")
+    logger.info(f"Request FILES: {request.FILES}")
+
+    serializer = FrontSerializer(front, data=request.data, partial=True)
+    if serializer.is_valid():
+        logger.info("Update Front - Serializer is valid")
+        
+        # Handle logo_image file replacement
+        if 'logo_image' in request.FILES:
+            logger.info("Update Front - Found logo_image in FILES")
+            if front.logo_image and front.logo_image.path and os.path.isfile(front.logo_image.path):
+                os.remove(front.logo_image.path)
+        
+        # Handle company_logo file replacement
+        if 'company_logo' in request.FILES:
+            logger.info("Update Front - Found company_logo in FILES")
+            if front.company_logo and front.company_logo.path and os.path.isfile(front.company_logo.path):
+                os.remove(front.company_logo.path)
+        
+        serializer.save()
+        return Response(serializer.data)
+    else:
+        logger.error(f"Update Front - Serializer errors: {serializer.errors}")
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+def delete_front(request,pk):
+    try:
+        front = Front.objects.get(pk=pk)
+        # Clean up logo_image file
+        if front.logo_image and front.logo_image.path and os.path.isfile(front.logo_image.path):
+            os.remove(front.logo_image.path)
+        # Clean up company_logo file
+        if front.company_logo and front.company_logo.path and os.path.isfile(front.company_logo.path):
+            os.remove(front.company_logo.path)
+        front.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except Front.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 

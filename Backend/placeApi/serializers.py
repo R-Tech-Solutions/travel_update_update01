@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Place, PlaceImage, ItineraryDay, ItineraryPhoto, Booking, Item, Service, GalleryPhoto, Post, Contact
+from .models import Place, PlaceImage, ItineraryDay, ItineraryPhoto, Booking, Item, Service, GalleryPhoto, Post, Contact, Front
 
 class PlaceImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -56,4 +56,10 @@ class PostSerializer(serializers.ModelSerializer):
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
+        fields = '__all__'
+
+
+class FrontSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Front
         fields = '__all__'

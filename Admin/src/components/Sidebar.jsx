@@ -22,6 +22,7 @@ const Sidebar = () => {
     { id: 5, path: "/gellery", name: "Gellery", icon: LuBox },
     { id: 6, path: "/Posts", name: "Posts", icon: LuCalendar },
     { id: 7, path: "/Settings", name: "Setting", icon: LuCalendar },
+    { id: 8, path: "/Front", name: "Front", icon: LuCalendar },
   ];
   return (
     <div className="w-16 md:w-56 fixed left-0 top-0 z-10 h-screen border-r pt-8 px-4 bg-white overflow-y-auto">

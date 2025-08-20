@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import Hero from "../components/Hero/Hero";
 import Slider from "../components/Servicess/Slider";
 import OurService from "../components/OurService/OurService";
+import { BackendUrl } from "../BackendUrl";
+
 // import Testimonial from "../components/Testimonial/Testimonial";
 import Banner from "../components/Banner/Banner";
 import BannerPic from "../components/BannerPic/BannerPic";
