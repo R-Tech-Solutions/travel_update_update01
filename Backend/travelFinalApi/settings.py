@@ -316,20 +316,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'travelFinalApi.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DB_NAME'),
-#         'USER': os.getenv('DB_USER'),
-#         'PASSWORD': os.getenv('DB_PASSWORD'),
-#         'HOST': os.getenv('DB_HOST'),
-#         'PORT': os.getenv('DB_PORT', '5432'),
-#     }
-# }
 #https://citytoursrilanka.com/
 DATABASES = {
     'default': {
@@ -353,10 +339,6 @@ DATABASES = {
 #     }
 # }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -372,10 +354,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -384,35 +362,24 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    # "https://admin.citytourslanka.com",
-    # "https://citytourslanka.com",
-
-    "http://localhost:5173",    # Frontend (Vite/React default)
-    "http://127.0.0.1:5173",    # Alternative frontend URL
-    "http://localhost:8000",    # Backend (if accessed via browser)
-    "http://127.0.0.1:8000",    # Alternative backend URL
+    "https://admin.citytourslanka.com",
+    "https://citytourslanka.com",
+    # "http://localhost:5173",    # Frontend (Vite/React default)
+    # "http://127.0.0.1:5173",    # Alternative frontend URL
+    # "http://localhost:8000",    # Backend (if accessed via browser)
+    # "http://127.0.0.1:8000",    # Alternative backend URL
 
 ]
-
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
@@ -421,7 +388,6 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
-
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
@@ -433,11 +399,9 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
-
 DATA_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100 MB
 
-# Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
@@ -447,10 +411,6 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
 
-# For development/testing, you can use the console backend
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
-
-# Security Settings
 SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -460,8 +420,5 @@ X_FRAME_OPTIONS = 'DENY'
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-
-# Trust the 'X-Forwarded-Proto' header from Nginx
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') 
 
 APPEND_SLASH = False
