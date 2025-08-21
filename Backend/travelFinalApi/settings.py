@@ -268,7 +268,7 @@ SECRET_KEY = 'django-insecure-)*m7l1t+ix&law8e5#f-e!iv%jcc+-+do6!n4l*7bo=ps9z72+
  
 DEBUG = True
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com').split(',')
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com,127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com,').split(',')
 
 # Application definition
 
@@ -316,28 +316,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'travelFinalApi.wsgi.application'
 
-#https://citytoursrilanka.com/
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'travel_data',
-        'USER': 'postgres',
-        'PASSWORD': '12345678',
-        'HOST': 'localhost',
-        'PORT': '5433',
+        'NAME': 'postgres',
+        'USER': 'postgres',  
+        'PASSWORD': 'HY2TsOozWipIXMGMD0XL',
+        'HOST': 'travel-site.csj8qkgam2pb.us-east-1.rds.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'travel_data',
-#         'USER': 'postgres',
-#         'PASSWORD': '12345678',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -373,11 +362,6 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "https://admin.citytourslanka.com",
     "https://citytourslanka.com",
-    # "http://localhost:5173",    # Frontend (Vite/React default)
-    # "http://127.0.0.1:5173",    # Alternative frontend URL
-    # "http://localhost:8000",    # Backend (if accessed via browser)
-    # "http://127.0.0.1:8000",    # Alternative backend URL
-
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
