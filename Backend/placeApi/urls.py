@@ -6,7 +6,7 @@ from .views import (
     list_items, create_item, get_item, update_item, delete_item,
     list_gallery_photos, create_gallery_photo, delete_gallery_photo,
     list_services, create_service, get_service, update_service, delete_service,
-    list_posts, create_post, get_post, update_post, delete_post , list_contacts, create_contact,get_contact,update_contact,delete_contact, list_front, create_front, get_front, update_front, delete_front
+    list_posts, create_post, get_post, update_post, delete_post , list_contacts, create_contact,get_contact,update_contact,delete_contact, list_front, create_front, get_front, update_front, delete_front  
 )
 
 
