@@ -53,6 +53,37 @@ const Blog = () => {
     }
   };
 
+  // Cloudinary cloud name must match backend settings
+  const CLOUDINARY_CLOUD_NAME = "djbf0hou3";
+
+  // Normalize image URL from backend (Cloudinary or Django media)
+  const getImageUrl = (img) => {
+    if (!img) return "/placeholder.svg";
+    // Absolute URL (Cloudinary or any CDN)
+    if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+      return img;
+    }
+    // Object shapes
+    if (typeof img === "object" && img !== null) {
+      if (img instanceof File) return URL.createObjectURL(img);
+      if (typeof img.url === "string") return getImageUrl(img.url);
+      if (typeof img.image === "string") return getImageUrl(img.image);
+      if (img.file instanceof File) return URL.createObjectURL(img.file);
+    }
+    // Relative path
+    if (typeof img === "string") {
+      const cleanPath = img.startsWith('/') ? img.substring(1) : img;
+      if (cleanPath.startsWith("media/") || cleanPath.startsWith("static/")) {
+        return `${BackendUrl}/${cleanPath}`;
+      }
+      // Ensure Cloudinary delivery type prefix exists
+      const hasDeliveryPrefix = /^(image|video|raw)\//.test(cleanPath);
+      const cloudinaryPath = hasDeliveryPrefix ? cleanPath : `image/upload/${cleanPath}`;
+      return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${cloudinaryPath}`;
+    }
+    return "/placeholder.svg";
+  };
+
   // Particle background component (from Service.jsx)
   const ParticleBackground = () => {
     return (
@@ -111,8 +142,7 @@ const Blog = () => {
                 <a href={`/blog/${post.id}`}>
                   <img 
                     className="rounded-t-lg w-full h-48 object-cover" 
-                    // src={`http://127.0.0.1:8000${post.post_image}`} 
-                    src={`${BackendUrl}${post.post_image}`} 
+                    src={getImageUrl(post.post_image)} 
                     alt={post.post_title} 
                   />
                 </a>

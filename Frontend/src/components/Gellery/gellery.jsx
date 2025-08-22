@@ -3,6 +3,38 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import {BackendUrl} from "../../BackendUrl";
 
+// Cloudinary cloud name must match backend settings
+const CLOUDINARY_CLOUD_NAME = "djbf0hou3";
+
+// Normalize image URL from backend (Cloudinary or Django media)
+const getImageUrl = (img) => {
+    if (!img) return "/placeholder.svg";
+
+    // Absolute URL (Cloudinary or any CDN)
+    if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+        return img;
+    }
+
+    // Object shapes
+    if (typeof img === "object" && img !== null) {
+        if (img instanceof File) return URL.createObjectURL(img);
+        if (typeof img.url === "string") return getImageUrl(img.url);
+        if (typeof img.image === "string") return getImageUrl(img.image);
+        if (img.file instanceof File) return URL.createObjectURL(img.file);
+    }
+
+    // Relative path
+    if (typeof img === "string") {
+        const cleanPath = img.startsWith('/') ? img.substring(1) : img;
+        if (cleanPath.startsWith("media/") || cleanPath.startsWith("static/")) {
+            return `${BackendUrl}/${cleanPath}`;
+        }
+        return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${cleanPath}`;
+    }
+
+    return "/placeholder.svg";
+};
+
 
 const galleryImages = [
 	{
@@ -168,7 +200,7 @@ const Gellery = () => {
 													setActiveIndex(idx);
 													setModalOpen(true);
 												}}
-												src={`${BackendUrl}${img.image}`}
+												src={getImageUrl(img.image)}
 												alt={`gallery photo ${img.id}`}
 												className="object-cover select-none w-full h-auto bg-gray-200 rounded cursor-zoom-in aspect-[5/6] lg:aspect-[2/3] xl:aspect-[3/4] transition-transform duration-300 hover:scale-105 hover:shadow-2xl"
 												style={{ userSelect: "none" }}
@@ -232,7 +264,7 @@ const Gellery = () => {
 									{/* Image */}
 									{galleryPhotos[activeIndex] && (
 										<img
-											src={`${BackendUrl}${galleryPhotos[activeIndex].image}`}
+											src={getImageUrl(galleryPhotos[activeIndex].image)}
 											alt={`gallery photo ${galleryPhotos[activeIndex].id}`}
 											className="object-contain object-center w-full h-full select-none cursor-zoom-out"
 											style={{ userSelect: "none" }}

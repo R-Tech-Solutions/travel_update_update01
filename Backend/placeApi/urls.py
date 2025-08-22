@@ -70,4 +70,7 @@ urlpatterns = [
     path('front/<int:pk>/', get_front, name='get_front'),
     path('front/<int:pk>/update/', update_front, name='update_front'),
     path('front/<int:pk>/delete/', delete_front, name='delete_front'),
-]
+
+
+    # telegra booking list
+    ]

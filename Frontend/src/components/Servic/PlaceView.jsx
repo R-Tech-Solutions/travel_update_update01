@@ -4,12 +4,35 @@ import PropTypes from 'prop-types';
 import { motion, useSpring, useMotionValue } from "framer-motion";
 import {BackendUrl} from "../../BackendUrl";
 
+// Cloudinary cloud name must match backend settings
+const CLOUDINARY_CLOUD_NAME = "djbf0hou3";
+
 // Helper: get image URL for preview
 const getImageUrl = (img) => {
   if (!img) return "/placeholder.svg";
-  if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://")))
+
+  // Absolute/Cloudinary URL
+  if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
     return img;
-  if (typeof img === "string") return `${BackendUrl}${img}`;
+  }
+
+  // Object shapes from API or local state
+  if (typeof img === "object" && img !== null) {
+    if (img instanceof File) return URL.createObjectURL(img);
+    if (typeof img.url === "string") return getImageUrl(img.url);
+    if (typeof img.image === "string") return getImageUrl(img.image);
+    if (img.file instanceof File) return URL.createObjectURL(img.file);
+  }
+
+  // Relative path: prefer Django media, else assume Cloudinary path/public_id
+  if (typeof img === "string") {
+    const cleanPath = img.startsWith('/') ? img.substring(1) : img;
+    if (cleanPath.startsWith("media/") || cleanPath.startsWith("static/")) {
+      return `${BackendUrl}/${cleanPath}`;
+    }
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${cleanPath}`;
+  }
+
   return "/placeholder.svg";
 };
 

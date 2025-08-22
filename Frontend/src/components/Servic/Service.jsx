@@ -15,27 +15,37 @@ import {BackendUrl} from "../../BackendUrl";
 // Register GSAP plugin
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
+// Cloudinary cloud name must match backend settings
+const CLOUDINARY_CLOUD_NAME = "djbf0hou3";
+
 // Helper: get image URL for preview (like AddPlace)
 const getImageUrl = (img) => {
   if (!img) return "/placeholder.svg";
-  
-  // Handle full URLs
+
+  // Absolute/Cloudinary URL
   if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
     return img;
   }
-  
-  // Handle relative paths from backend
+
+  // Object shapes from API or local state
+  if (typeof img === "object" && img !== null) {
+    if (img instanceof File) return URL.createObjectURL(img);
+    if (typeof img.url === "string") return getImageUrl(img.url);
+    if (typeof img.image === "string") return getImageUrl(img.image);
+    if (img.file instanceof File) return URL.createObjectURL(img.file);
+  }
+
+  // Relative paths from backend
   if (typeof img === "string") {
-    // Remove any leading slashes to prevent double slashes
     const cleanPath = img.startsWith('/') ? img.substring(1) : img;
-    return `${BackendUrl}/${cleanPath}`;
+    // If path looks like a Django media file, serve from backend
+    if (cleanPath.startsWith("media/") || cleanPath.startsWith("static/")) {
+      return `${BackendUrl}/${cleanPath}`;
+    }
+    // Otherwise assume it's a Cloudinary public path
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${cleanPath}`;
   }
-  
-  // Handle File objects (if any)
-  if (img instanceof File) {
-    return URL.createObjectURL(img);
-  }
-  
+
   return "/placeholder.svg";
 };
 

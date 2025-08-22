@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {BackendUrl} from "../../BackendUrl";
+import {BackendUrl} from "../../BackendUrl";// Ensure correct import
 
 const Slider = () => {
   const [displayText, setDisplayText] = useState("");
@@ -9,15 +9,60 @@ const Slider = () => {
   const [error, setError] = useState(null);
   const fullText = "Welcome To";
 
+  // Cloudinary cloud name must match backend settings
+  const CLOUDINARY_CLOUD_NAME = "djbf0hou3";
+
+  // Normalize image URL from backend (Cloudinary or Django media)
+  const getImageUrl = (img) => {
+    if (!img) {
+      console.warn("Image is null or undefined, using fallback");
+      return "https://via.placeholder.com/300"; // Fallback to known URL
+    }
+    if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+      return img;
+    }
+    if (typeof img === "object" && img !== null) {
+      if (img instanceof File) return URL.createObjectURL(img);
+      if (typeof img.url === "string") return getImageUrl(img.url);
+      if (typeof img.image === "string") return getImageUrl(img.image);
+    }
+    if (typeof img === "string") {
+      const cleanPath = img.startsWith("/") ? img.substring(1) : img;
+      if (cleanPath.startsWith("media/") || cleanPath.startsWith("static/")) {
+        return `${BackendUrl}/${cleanPath}`;
+      }
+      const hasDeliveryPrefix = /^(image|video|raw)\//.test(cleanPath);
+      const cloudinaryPath = hasDeliveryPrefix ? cleanPath : `image/upload/${cleanPath}`;
+      return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/${cloudinaryPath}`;
+    }
+    console.warn("Image format invalid, using fallback");
+    return "https://via.placeholder.com/300";
+  };
+
   // Fetch items from backend
   useEffect(() => {
     const fetchItems = async () => {
       try {
         const response = await axios.get(`${BackendUrl}/api/items/`);
-        setItems(response.data);
+        console.log("Fetch items response:", response.data);
+        const items = Array.isArray(response.data) ? response.data : [];
+        if (items.length === 0) {
+          console.warn("No items returned from backend");
+          setError("No items available to display.");
+        }
+        items.forEach((item, index) => {
+          console.log(`Item ${index + 1}:`, {
+            id: item.id,
+            title: item.title,
+            image: item.image,
+            normalizedUrl: getImageUrl(item.image),
+          });
+        });
+        setItems(items);
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch items: ' + err.message);
+        console.error("Error fetching items:", err.response || err.message);
+        setError("Failed to fetch items: " + err.message);
         setLoading(false);
       }
     };
@@ -39,8 +84,18 @@ const Slider = () => {
     return () => clearInterval(typing);
   }, []);
 
-  if (loading) return <div className="w-full h-[35vh] bg-black flex items-center justify-center text-white">Loading...</div>;
-  if (error) return <div className="w-full h-[35vh] bg-black flex items-center justify-center text-white">{error}</div>;
+  if (loading)
+    return (
+      <div className="w-full h-[35vh] bg-black flex items-center justify-center text-white">
+        Loading...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="w-full h-[35vh] bg-black flex items-center justify-center text-white">
+        {error}
+      </div>
+    );
 
   return (
     <div className="relative w-full flex flex-col items-center bg-black overflow-hidden">
@@ -61,14 +116,18 @@ const Slider = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {items.map((item) => (
               <div key={item.id} className="card">
-                <img 
-                  src={`${BackendUrl}${item.image}`} 
-                  alt={item.title}
+                <img
+                  src={getImageUrl(item.image)}
+                  alt={item.title || "Item image"}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error(`Error loading image for ${item.title || "item"}:`, e);
+                    e.target.src = "https://via.placeholder.com/300";
+                  }}
                 />
                 <div className="card__content">
-                  <p className="card__title">{item.title}</p>
-                  <p className="card__description">{item.description}</p>
+                  <p className="card__title">{item.title || "No Title"}</p>
+                  <p className="card__description">{item.description || "No Description"}</p>
                 </div>
               </div>
             ))}
@@ -123,8 +182,8 @@ const Slider = () => {
           font-weight: 700;
         }
         .card:hover img {
-          scale: 0;
-          transform: rotate(-45deg);
+          /* scale: 0; */ /* Disabled for debugging */
+          /* transform: rotate(-45deg); */ /* Disabled for debugging */
         }
         .card__description {
           margin: 10px 0 0;

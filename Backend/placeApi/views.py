@@ -12,10 +12,113 @@ import logging
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import cloudinary.uploader
+# import requests
+
+
+
+
+
+# # Telegram setup
+# TELEGRAM_BOT_TOKEN = "8402748042:AAH29VtyxQoCo4fL-WPxkJMiGcwjJAO5wPc"
+# ADMIN_CHAT_ID = 1592545533  # Your numeric user ID
+
+
+# def send_telegram_message(text: str):
+#     """
+#     Sends a message to the admin via Telegram bot.
+#     Prints the response for debugging.
+#     """
+#     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+#     payload = {
+#         "chat_id": ADMIN_CHAT_ID,
+#         "text": text,
+#         "parse_mode": "HTML"
+#     }
+#     try:
+#         response = requests.post(url, data=payload, timeout=10)
+#         response.raise_for_status()
+#         result = response.json()
+#         print("✅ Telegram response:", result)  # Debug info
+#         if not result.get("ok"):
+#             print("❌ Telegram failed:", result)
+#     except requests.exceptions.RequestException as e:
+#         print("❌ Telegram API error:", e)
+
+
+# @api_view(["POST"])
+# def confirm_booking(request):
+#     """
+#     Create a new booking and send Telegram notification to admin.
+#     """
+#     serializer = Booking_TelegramSerializer(data=request.data)
+#     if serializer.is_valid():
+#         booking = serializer.save()  # Save booking in DB
+
+#         # Prepare Telegram message
+#         message = (
+#             f"📢 <b>New Booking Confirmed!</b>\n\n"
+#             f"👤 Name: {booking.name}\n"
+#             f"📧 Email: {booking.email}\n"
+#             f"📞 Phone: {booking.phone}\n"
+#             f"📝 Details: {booking.details}"
+#         )
+
+#         # Send Telegram message
+#         send_telegram_message(message)
+
+#         return Response(
+#             {"message": "Booking confirmed, admin notified ✅"},
+#             status=status.HTTP_201_CREATED
+#         )
+
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# @api_view(["GET"])
+# def list_bookings(request):
+#     """
+#     List all bookings, newest first.
+#     """
+#     bookings = Booking_Telegram.objects.all().order_by("-created_at")
+#     serializer = Booking_TelegramSerializer(bookings, many=True)
+#     return Response(serializer.data)
+
+
+# #telegram setup end
 
 
 # Set up logging
 logger = logging.getLogger(__name__)
+
+def delete_cloudinary_file(cloudinary_field):
+    """Helper function to delete a file from Cloudinary"""
+    if cloudinary_field:
+        try:
+            # Extract the public_id from the Cloudinary URL
+            if hasattr(cloudinary_field, 'public_id'):
+                public_id = cloudinary_field.public_id
+            else:
+                # If it's a string URL, try to extract public_id
+                url = str(cloudinary_field)
+                if 'cloudinary.com' in url:
+                    # Extract public_id from URL like: https://res.cloudinary.com/djbf0hou3/image/upload/v1234567890/folder/filename.jpg
+                    parts = url.split('/')
+                    if len(parts) >= 8:
+                        public_id = '/'.join(parts[6:-1]) + '/' + parts[-1].split('.')[0]
+                    else:
+                        return False
+                else:
+                    return False
+            
+            # Delete the file from Cloudinary
+            result = cloudinary.uploader.destroy(public_id)
+            logger.info(f"Cloudinary delete result: {result}")
+            return result.get('result') == 'ok'
+        except Exception as e:
+            logger.error(f"Error deleting Cloudinary file: {str(e)}")
+            return False
+    return False
 
 @api_view(['GET'])
 def get_places(request):
@@ -64,26 +167,30 @@ def create_places(request):
 def place_delete(request, pk):
     try:
         place = Place.objects.get(pk=pk)
-        # Delete all itinerary photos from storage
+        
+        # Delete main image from Cloudinary
+        if place.main_image:
+            delete_cloudinary_file(place.main_image)
+        
+        # Delete all itinerary photos from Cloudinary
         for day in place.itinerary_days.all():
             for photo in day.photos.all():
-                if photo.image and photo.image.path and os.path.isfile(photo.image.path):
-                    os.remove(photo.image.path)
+                if photo.image:
+                    delete_cloudinary_file(photo.image)
                 photo.delete()
-            day.delete()
-        # Delete main image if exists
-        if place.main_image and place.main_image.path and os.path.isfile(place.main_image.path):
-            os.remove(place.main_image.path)
-        # Delete sub images
+        
+        # Delete sub images from Cloudinary
         for sub_image in place.sub_images.all():
-            if sub_image.image and sub_image.image.path and os.path.isfile(sub_image.image.path):
-                os.remove(sub_image.image.path)
+            if sub_image.image:
+                delete_cloudinary_file(sub_image.image)
             sub_image.delete()
+        
         place.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     except Place.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
+        logger.error(f"Error deleting place {pk}: {str(e)}")
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['PUT'])
@@ -98,34 +205,32 @@ def place_update(request, pk):
         # Handle main image
         main_image = request.FILES.get('main_image')
         if main_image:
-            if place.main_image and place.main_image.path and os.path.isfile(place.main_image.path):
-                os.remove(place.main_image.path)
-            place.main_image = main_image
+            place.update_main_image(main_image)
         elif data.get('main_image_clear') == 'true':
-            if place.main_image and place.main_image.path and os.path.isfile(place.main_image.path):
-                os.remove(place.main_image.path)
+            if place.main_image:
+                delete_cloudinary_file(place.main_image)
             place.main_image = None
         # Handle sub images
         sub_images = request.FILES.getlist('sub_images')
         if sub_images:
-            for img in place.sub_images.all():
-                img.delete()
-            for img in sub_images:
-                PlaceImage.objects.create(place=place, image=img)
+            place.update_sub_images(sub_images)
         elif data.get('sub_images_clear') == 'true':
             for img in place.sub_images.all():
+                if img.image:
+                    delete_cloudinary_file(img.image)
                 img.delete()
+        # Delete existing itinerary data and photos (Cloudinary handles file deletion automatically)
+        for day in place.itinerary_days.all():
+            for photo in day.photos.all():
+                # Delete old photo from Cloudinary
+                if photo.image:
+                    delete_cloudinary_file(photo.image)
+                photo.delete()
+            day.delete()
         # Handle itinerary data
         itinerary_data = data.get('itinerary', [])
         if isinstance(itinerary_data, str):
             itinerary_data = json.loads(itinerary_data)
-        # Delete existing itinerary data and photos
-        for day in place.itinerary_days.all():
-            for photo in day.photos.all():
-                if photo.image and photo.image.path and os.path.isfile(photo.image.path):
-                    os.remove(photo.image.path)
-                photo.delete()
-            day.delete()
         # Create new itinerary data
         for day_data in itinerary_data:
             day = ItineraryDay.objects.create(
@@ -146,13 +251,15 @@ def place_update(request, pk):
 def delete_itinerary_photo(request, photo_id):
     try:
         photo = ItineraryPhoto.objects.get(pk=photo_id)
-        if photo.image and photo.image.path and os.path.isfile(photo.image.path):
-            os.remove(photo.image.path)
+        # Delete file from Cloudinary first
+        if photo.image:
+            delete_cloudinary_file(photo.image)
         photo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     except ItineraryPhoto.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
+        logger.error(f"Error deleting itinerary photo {photo_id}: {str(e)}")
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
@@ -334,9 +441,7 @@ def update_item(request, pk):
     if serializer.is_valid():
         # Handle image update
         if 'image' in request.FILES:
-            # Delete old image if exists
-            if item.image and item.image.path and os.path.isfile(item.image.path):
-                os.remove(item.image.path)
+            item.update_image(request.FILES['image'])
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -345,9 +450,9 @@ def update_item(request, pk):
 def delete_item(request, pk):
     try:
         item = Item.objects.get(pk=pk)
-        # Delete image file if exists
-        if item.image and item.image.path and os.path.isfile(item.image.path):
-            os.remove(item.image.path)
+        # Delete file from Cloudinary first
+        if item.image:
+            delete_cloudinary_file(item.image)
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     except Item.DoesNotExist:
@@ -395,6 +500,9 @@ def update_service(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = ServiceSerializer(service, data=request.data, partial=True)
     if serializer.is_valid():
+        # Handle image update
+        if 'image' in request.FILES:
+            service.update_image(request.FILES['image'])
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -430,8 +538,9 @@ def create_gallery_photo(request):
 def delete_gallery_photo(request, pk):
     try:
         photo = GalleryPhoto.objects.get(pk=pk)
-        if photo.image and photo.image.path and os.path.isfile(photo.image.path):
-            os.remove(photo.image.path)
+        # Delete file from Cloudinary first
+        if photo.image:
+            delete_cloudinary_file(photo.image)
         photo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     except GalleryPhoto.DoesNotExist:
@@ -474,9 +583,7 @@ def update_post(request, pk):
     if serializer.is_valid():
         # Handle image update
         if 'post_image' in request.FILES:
-            # Delete old image if exists
-            if post.post_image and post.post_image.path and os.path.isfile(post.post_image.path):
-                os.remove(post.post_image.path)
+            post.update_image(request.FILES['post_image'])
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -485,9 +592,9 @@ def update_post(request, pk):
 def delete_post(request, pk):
     try:
         post = Post.objects.get(pk=pk)
-        # Delete image file if exists
-        if post.post_image and post.post_image.path and os.path.isfile(post.post_image.path):
-            os.remove(post.post_image.path)
+        # Delete file from Cloudinary first
+        if post.post_image:
+            delete_cloudinary_file(post.post_image)
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     except Post.DoesNotExist:
@@ -619,18 +726,10 @@ def update_front(request,pk):
     if serializer.is_valid():
         logger.info("Update Front - Serializer is valid")
         
-        # Handle logo_image file replacement
-        if 'logo_image' in request.FILES:
-            logger.info("Update Front - Found logo_image in FILES")
-            if front.logo_image and front.logo_image.path and os.path.isfile(front.logo_image.path):
-                os.remove(front.logo_image.path)
-        
         # Handle company_logo file replacement
         if 'company_logo' in request.FILES:
             logger.info("Update Front - Found company_logo in FILES")
-            if front.company_logo and front.company_logo.path and os.path.isfile(front.company_logo.path):
-                os.remove(front.company_logo.path)
-        
+            front.update_logo(request.FILES['company_logo'])
         serializer.save()
         return Response(serializer.data)
     else:
@@ -642,12 +741,9 @@ def update_front(request,pk):
 def delete_front(request,pk):
     try:
         front = Front.objects.get(pk=pk)
-        # Clean up logo_image file
-        if front.logo_image and front.logo_image.path and os.path.isfile(front.logo_image.path):
-            os.remove(front.logo_image.path)
-        # Clean up company_logo file
-        if front.company_logo and front.company_logo.path and os.path.isfile(front.company_logo.path):
-            os.remove(front.company_logo.path)
+        # Delete file from Cloudinary first
+        if front.company_logo:
+            delete_cloudinary_file(front.company_logo)
         front.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     except Front.DoesNotExist:

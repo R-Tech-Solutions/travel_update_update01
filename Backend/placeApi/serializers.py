@@ -63,3 +63,4 @@ class FrontSerializer(serializers.ModelSerializer):
     class Meta:
         model = Front
         fields = '__all__'
+
