@@ -33,8 +33,12 @@ SECRET_KEY = 'django-insecure-)*m7l1t+ix&law8e5#f-e!iv%jcc+-+do6!n4l*7bo=ps9z72+
  
 DEBUG = True
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com').split(',')
+<<<<<<< HEAD
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com,127.0.0.1,localhost').split(',')
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com,').split(',')
+=======
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'citytourslanka.com,admin.citytourslanka.com,').split(',')
+>>>>>>> cc18ba0c1c23bf7d96990427da079cfe3aa74d4f
 
 # Application definition
 
@@ -83,32 +87,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'travelFinalApi.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DB_NAME'),
-#         'USER': os.getenv('DB_USER'),
-#         'PASSWORD': os.getenv('DB_PASSWORD'),
-#         'HOST': os.getenv('DB_HOST'),
-#         'PORT': os.getenv('DB_PORT', '5432'),
-#     }
-# }
-#https://citytoursrilanka.com/
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'travel_data',
-        'USER': 'postgres',
-        'PASSWORD': '12345678',
-        'HOST': 'localhost',
-        'PORT': '5433',
+        'NAME': 'postgres',
+        'USER': 'postgres',  
+        'PASSWORD': 'HY2TsOozWipIXMGMD0XL',
+        'HOST': 'travel-site.csj8qkgam2pb.us-east-1.rds.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
+<<<<<<< HEAD
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
@@ -134,6 +124,8 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+=======
+>>>>>>> cc18ba0c1c23bf7d96990427da079cfe3aa74d4f
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -150,10 +142,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -162,16 +150,13 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+<<<<<<< HEAD
 # Cloudinary Storage Configuration
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'djbf0hou3',
@@ -185,22 +170,15 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+=======
+>>>>>>> cc18ba0c1c23bf7d96990427da079cfe3aa74d4f
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    # "https://admin.citytourslanka.com",
-    # "https://citytourslanka.com",
-
-    "http://localhost:5173",    # Frontend (Vite/React default)
-    "http://127.0.0.1:5173",    # Alternative frontend URL
-    "http://localhost:8000",    # Backend (if accessed via browser)
-    "http://127.0.0.1:8000",    # Alternative backend URL
-
+    "https://admin.citytourslanka.com",
+    "https://citytourslanka.com",
 ]
-
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
@@ -209,7 +187,6 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
-
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
@@ -221,11 +198,9 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
-
 DATA_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100 MB
 
-# Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
@@ -235,10 +210,6 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
 
-# For development/testing, you can use the console backend
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
-
-# Security Settings
 SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -249,6 +220,7 @@ SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
+<<<<<<< HEAD
 # Trust the 'X-Forwarded-Proto' header from Nginx
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') 
 
@@ -260,3 +232,6 @@ cloudinary.config(
     api_key = '846826115921222',
     api_secret = 'w2MtN2Sz6Hrh9uv9UNrsbKcyVzk',
 )
+=======
+APPEND_SLASH = False
+>>>>>>> cc18ba0c1c23bf7d96990427da079cfe3aa74d4f
